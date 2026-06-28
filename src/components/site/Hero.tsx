@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Heart } from "lucide-react";
 import heroImg from "@/assets/hero-friends.jpg";
@@ -24,6 +25,28 @@ const stats = [
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-hero-gradient pt-6 pb-20">
+      {/* animated cinematic background blobs */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 -left-24 h-[480px] w-[480px] rounded-full bg-rose-gradient opacity-30 blur-3xl"
+        animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-40 right-[-10%] h-[520px] w-[520px] rounded-full opacity-25 blur-3xl"
+        style={{ background: "radial-gradient(circle, oklch(0.78 0.12 80) 0%, transparent 70%)" }}
+        animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1, 1.15, 1] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute top-1/3 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
+        style={{ background: "radial-gradient(circle, oklch(0.88 0.05 10) 0%, transparent 70%)" }}
+        animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.35, 0.2] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+
       {/* sparkles */}
       <Sparkles className="absolute left-[8%] top-[35%] h-4 w-4 text-gold animate-sparkle" />
       <Sparkles className="absolute right-[42%] top-[20%] h-5 w-5 text-rose animate-sparkle" style={{ animationDelay: "1.2s" }} />
@@ -49,16 +72,16 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <button className="group inline-flex items-center gap-2 rounded-full bg-rose-gradient px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-luxe transition hover:scale-[1.02]">
+            <Link to="/experiences" className="group inline-flex items-center gap-2 rounded-full bg-rose-gradient px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-luxe transition hover:scale-[1.02]">
               Explore Experiences
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-            </button>
-            <button className="inline-flex items-center gap-3 text-sm font-semibold text-ink">
+            </Link>
+            <Link to="/experiences" className="inline-flex items-center gap-3 text-sm font-semibold text-ink">
               <span className="grid h-12 w-12 place-items-center rounded-full bg-rose-gradient text-primary-foreground shadow-luxe">
                 <Play className="h-4 w-4 fill-current" />
               </span>
               Watch Our Story
-            </button>
+            </Link>
           </div>
 
           <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-4">
