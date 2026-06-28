@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowLeft, Heart, MapPin, Calendar } from "lucide-react";
 import painting from "@/assets/exp-painting.jpg";
 import food from "@/assets/exp-food.jpg";
@@ -6,10 +7,10 @@ import candles from "@/assets/exp-candles.jpg";
 import { motion } from "framer-motion";
 
 const experiences = [
-  { img: painting, badge: "Art & Creativity", title: "Canvas & Conversations", sub: "Sip · Paint · Connect", date: "18 May, 2026 · 4:00 PM", loc: "The Art Studio, Mumbai", price: "₹1,499" },
-  { img: food, badge: "Food & Drinks", title: "Pizza & Playlist Night", sub: "Food · Music · Games", date: "19 May, 2026 · 7:00 PM", loc: "The Rolling Table, Pune", price: "₹1,299" },
-  { img: social, badge: "Social Gathering", title: "Talks, Tacos & People", sub: "Meet · Mingle · Make Friends", date: "20 May, 2026 · 6:00 PM", loc: "Popup Café, Bangalore", price: "₹999" },
-  { img: candles, badge: "DIY Workshops", title: "Candle Making Workshop", sub: "Create · Relax · Unwind", date: "21 May, 2026 · 11:00 AM", loc: "Studio Bloom, Delhi", price: "₹1,199" },
+  { slug: "canvas-and-conversations", img: painting, badge: "Art & Creativity", title: "Canvas & Conversations", sub: "Sip · Paint · Connect", date: "18 Jul, 2026 · 4:00 PM", loc: "The Art Studio, Mumbai", price: "₹1,499" },
+  { slug: "pizza-and-playlist-night", img: food, badge: "Food & Drinks", title: "Pizza & Playlist Night", sub: "Food · Music · Games", date: "19 Jul, 2026 · 7:00 PM", loc: "The Rolling Table, Pune", price: "₹1,299" },
+  { slug: "talks-tacos-and-people", img: social, badge: "Social Gathering", title: "Talks, Tacos & People", sub: "Meet · Mingle · Make Friends", date: "20 Jul, 2026 · 6:00 PM", loc: "Popup Café, Bangalore", price: "₹999" },
+  { slug: "candle-making-workshop", img: candles, badge: "DIY Workshops", title: "Candle Making Workshop", sub: "Create · Relax · Unwind", date: "21 Jul, 2026 · 11:00 AM", loc: "Studio Bloom, Delhi", price: "₹1,199" },
 ];
 
 export function Featured() {
@@ -22,9 +23,9 @@ export function Featured() {
             Something for <span className="italic text-primary">Every Explorer</span>
           </h2>
         </div>
-        <a href="#" className="hidden items-center gap-2 text-sm font-semibold text-primary sm:inline-flex">
+        <Link to="/experiences" className="hidden items-center gap-2 text-sm font-semibold text-primary sm:inline-flex">
           View All Experiences <ArrowRight className="h-4 w-4" />
-        </a>
+        </Link>
       </div>
 
       <div className="relative mt-8">
