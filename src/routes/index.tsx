@@ -1,29 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Navbar } from "@/components/site/Navbar";
+import { Hero } from "@/components/site/Hero";
+import { SearchBar } from "@/components/site/SearchBar";
+import { Categories } from "@/components/site/Categories";
+import { Featured } from "@/components/site/Featured";
+import { StatsBand } from "@/components/site/StatsBand";
+import { Movement } from "@/components/site/Movement";
+import { Testimonials } from "@/components/site/Testimonials";
+import { Newsletter } from "@/components/site/Newsletter";
+import { Footer } from "@/components/site/Footer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "AN Out & About — Step Out. Experience More." },
+      { name: "description", content: "Curated workshops, social gatherings & immersive experiences. Step out, meet new people, learn something new, create memories." },
+      { property: "og:title", content: "AN Out & About — Step Out. Experience More." },
+      { property: "og:description", content: "Discover handpicked workshops and community experiences across India." },
     ],
   }),
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <Hero />
+      <SearchBar />
+      <Categories />
+      <Featured />
+      <StatsBand />
+      <Movement />
+      <Testimonials />
+      <Newsletter />
+      <Footer />
     </div>
   );
 }
