@@ -14,16 +14,192 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          admin_note: string | null
+          amount_inr: number
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          experience_id: string
+          id: string
+          payment_screenshot_url: string | null
+          seats: number
+          status: Database["public"]["Enums"]["booking_status"]
+          updated_at: string
+          upi_txn_id: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount_inr: number
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          experience_id: string
+          id?: string
+          payment_screenshot_url?: string | null
+          seats?: number
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+          upi_txn_id?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount_inr?: number
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          experience_id?: string
+          id?: string
+          payment_screenshot_url?: string | null
+          seats?: number
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+          upi_txn_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiences: {
+        Row: {
+          capacity: number
+          category: string
+          city: string
+          created_at: string
+          date: string
+          description: string
+          gallery: Json | null
+          highlights: Json | null
+          host_bio: string | null
+          host_name: string | null
+          id: string
+          image_url: string | null
+          is_published: boolean
+          location: string
+          price_inr: number
+          slug: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+          whats_included: Json | null
+        }
+        Insert: {
+          capacity?: number
+          category: string
+          city: string
+          created_at?: string
+          date: string
+          description: string
+          gallery?: Json | null
+          highlights?: Json | null
+          host_bio?: string | null
+          host_name?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          location: string
+          price_inr: number
+          slug: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+          whats_included?: Json | null
+        }
+        Update: {
+          capacity?: number
+          category?: string
+          city?: string
+          created_at?: string
+          date?: string
+          description?: string
+          gallery?: Json | null
+          highlights?: Json | null
+          host_bio?: string | null
+          host_name?: string | null
+          id?: string
+          image_url?: string | null
+          is_published?: boolean
+          location?: string
+          price_inr?: number
+          slug?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+          whats_included?: Json | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      booking_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +326,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      booking_status: ["pending", "approved", "rejected"],
+    },
   },
 } as const
