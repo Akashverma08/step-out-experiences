@@ -38,35 +38,40 @@ export function Featured() {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {experiences.map((e, i) => (
-            <motion.article
+            <motion.div
               key={e.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="group overflow-hidden rounded-3xl bg-card shadow-card-soft transition hover:-translate-y-1 hover:shadow-luxe"
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <img src={e.img} alt={e.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
-                <span className="absolute left-3 top-3 rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-luxe">
-                  {e.badge}
-                </span>
-              </div>
-              <div className="p-5">
-                <h3 className="text-display text-xl font-semibold text-ink">{e.title}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{e.sub}</p>
-                <div className="mt-4 space-y-1.5 text-xs text-foreground/80">
-                  <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-primary" />{e.date}</div>
-                  <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />{e.loc}</div>
+              <Link
+                to="/experiences/$slug"
+                params={{ slug: e.slug }}
+                className="group block overflow-hidden rounded-3xl bg-card shadow-card-soft transition hover:-translate-y-1 hover:shadow-luxe"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img src={e.img} alt={e.title} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
+                  <span className="absolute left-3 top-3 rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-luxe">
+                    {e.badge}
+                  </span>
                 </div>
-                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
-                  <span className="text-display text-xl font-semibold text-ink">{e.price}</span>
-                  <button className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/60 text-primary transition hover:bg-rose-gradient hover:text-primary-foreground">
-                    <Heart className="h-4 w-4" />
-                  </button>
+                <div className="p-5">
+                  <h3 className="text-display text-xl font-semibold text-ink">{e.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{e.sub}</p>
+                  <div className="mt-4 space-y-1.5 text-xs text-foreground/80">
+                    <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-primary" />{e.date}</div>
+                    <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />{e.loc}</div>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
+                    <span className="text-display text-xl font-semibold text-ink">{e.price}</span>
+                    <span className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/60 text-primary transition group-hover:bg-rose-gradient group-hover:text-primary-foreground">
+                      <Heart className="h-4 w-4" />
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </motion.article>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
