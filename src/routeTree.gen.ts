@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
+import { Route as ClaimAdminRouteImport } from './routes/claim-admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +23,11 @@ import { Route as AuthenticatedBookIdRouteImport } from './routes/_authenticated
 const ExperiencesRoute = ExperiencesRouteImport.update({
   id: '/experiences',
   path: '/experiences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaimAdminRoute = ClaimAdminRouteImport.update({
+  id: '/claim-admin',
+  path: '/claim-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -67,6 +73,7 @@ const AuthenticatedBookIdRoute = AuthenticatedBookIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/claim-admin': typeof ClaimAdminRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/claim-admin': typeof ClaimAdminRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/claim-admin': typeof ClaimAdminRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/my-bookings': typeof AuthenticatedMyBookingsRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/claim-admin'
     | '/experiences'
     | '/admin'
     | '/my-bookings'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/claim-admin'
     | '/experiences'
     | '/admin'
     | '/my-bookings'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/claim-admin'
     | '/experiences'
     | '/_authenticated/admin'
     | '/_authenticated/my-bookings'
@@ -134,6 +146,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ClaimAdminRoute: typeof ClaimAdminRoute
   ExperiencesRoute: typeof ExperiencesRouteWithChildren
   CategorySlugRoute: typeof CategorySlugRoute
 }
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       path: '/experiences'
       fullPath: '/experiences'
       preLoaderRoute: typeof ExperiencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/claim-admin': {
+      id: '/claim-admin'
+      path: '/claim-admin'
+      fullPath: '/claim-admin'
+      preLoaderRoute: typeof ClaimAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -237,6 +257,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ClaimAdminRoute: ClaimAdminRoute,
   ExperiencesRoute: ExperiencesRouteWithChildren,
   CategorySlugRoute: CategorySlugRoute,
 }
