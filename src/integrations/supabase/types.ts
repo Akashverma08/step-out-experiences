@@ -17,48 +17,69 @@ export type Database = {
       bookings: {
         Row: {
           admin_note: string | null
+          age: number | null
           amount_inr: number
+          city: string | null
           contact_email: string
           contact_name: string
           contact_phone: string
           created_at: string
+          date_of_birth: string | null
+          emergency_contact: string | null
           experience_id: string
+          gender: string | null
           id: string
           payment_screenshot_url: string | null
           seats: number
+          special_requests: string | null
           status: Database["public"]["Enums"]["booking_status"]
+          terms_accepted: boolean
           updated_at: string
           upi_txn_id: string | null
           user_id: string
         }
         Insert: {
           admin_note?: string | null
+          age?: number | null
           amount_inr: number
+          city?: string | null
           contact_email: string
           contact_name: string
           contact_phone: string
           created_at?: string
+          date_of_birth?: string | null
+          emergency_contact?: string | null
           experience_id: string
+          gender?: string | null
           id?: string
           payment_screenshot_url?: string | null
           seats?: number
+          special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
+          terms_accepted?: boolean
           updated_at?: string
           upi_txn_id?: string | null
           user_id: string
         }
         Update: {
           admin_note?: string | null
+          age?: number | null
           amount_inr?: number
+          city?: string | null
           contact_email?: string
           contact_name?: string
           contact_phone?: string
           created_at?: string
+          date_of_birth?: string | null
+          emergency_contact?: string | null
           experience_id?: string
+          gender?: string | null
           id?: string
           payment_screenshot_url?: string | null
           seats?: number
+          special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
+          terms_accepted?: boolean
           updated_at?: string
           upi_txn_id?: string | null
           user_id?: string
@@ -73,14 +94,61 @@ export type Database = {
           },
         ]
       }
+      contact_queries: {
+        Row: {
+          admin_reply: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          preferred_contact: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          preferred_contact?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          admin_reply?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          preferred_contact?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       experiences: {
         Row: {
+          age_requirement: string | null
+          cancellation_policy: string | null
           capacity: number
           category: string
           city: string
           created_at: string
           date: string
           description: string
+          dress_code: string | null
+          duration_minutes: number | null
+          faqs: Json | null
           gallery: Json | null
           highlights: Json | null
           host_bio: string | null
@@ -89,6 +157,8 @@ export type Database = {
           image_url: string | null
           is_published: boolean
           location: string
+          map_url: string | null
+          materials: Json | null
           price_inr: number
           slug: string
           subtitle: string | null
@@ -97,12 +167,17 @@ export type Database = {
           whats_included: Json | null
         }
         Insert: {
+          age_requirement?: string | null
+          cancellation_policy?: string | null
           capacity?: number
           category: string
           city: string
           created_at?: string
           date: string
           description: string
+          dress_code?: string | null
+          duration_minutes?: number | null
+          faqs?: Json | null
           gallery?: Json | null
           highlights?: Json | null
           host_bio?: string | null
@@ -111,6 +186,8 @@ export type Database = {
           image_url?: string | null
           is_published?: boolean
           location: string
+          map_url?: string | null
+          materials?: Json | null
           price_inr: number
           slug: string
           subtitle?: string | null
@@ -119,12 +196,17 @@ export type Database = {
           whats_included?: Json | null
         }
         Update: {
+          age_requirement?: string | null
+          cancellation_policy?: string | null
           capacity?: number
           category?: string
           city?: string
           created_at?: string
           date?: string
           description?: string
+          dress_code?: string | null
+          duration_minutes?: number | null
+          faqs?: Json | null
           gallery?: Json | null
           highlights?: Json | null
           host_bio?: string | null
@@ -133,6 +215,8 @@ export type Database = {
           image_url?: string | null
           is_published?: boolean
           location?: string
+          map_url?: string | null
+          materials?: Json | null
           price_inr?: number
           slug?: string
           subtitle?: string | null
