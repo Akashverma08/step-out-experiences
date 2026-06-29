@@ -24,8 +24,7 @@ const stats = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-hero-gradient pt-6 pb-20">
-      {/* animated cinematic background blobs */}
+    <section className="relative overflow-hidden bg-hero-gradient pt-6 pb-28 sm:pb-32 lg:pb-24">
       <motion.div
         aria-hidden
         className="pointer-events-none absolute -top-32 -left-24 h-[480px] w-[480px] rounded-full bg-rose-gradient opacity-30 blur-3xl"
@@ -39,20 +38,11 @@ export function Hero() {
         animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1, 1.15, 1] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute top-1/3 left-1/2 h-[300px] w-[300px] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
-        style={{ background: "radial-gradient(circle, oklch(0.88 0.05 10) 0%, transparent 70%)" }}
-        animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.35, 0.2] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
 
-      {/* sparkles */}
       <Sparkles className="absolute left-[8%] top-[35%] h-4 w-4 text-gold animate-sparkle" />
-      <Sparkles className="absolute right-[42%] top-[20%] h-5 w-5 text-rose animate-sparkle" style={{ animationDelay: "1.2s" }} />
-      <Sparkles className="absolute left-[44%] bottom-[18%] h-3 w-3 text-gold animate-sparkle" style={{ animationDelay: "2s" }} />
+      <Sparkles className="absolute right-[42%] top-[20%] hidden h-5 w-5 text-rose animate-sparkle sm:block" style={{ animationDelay: "1.2s" }} />
 
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 pt-8 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:px-10 lg:pt-14">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 pt-6 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:px-10 lg:pt-14">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -62,7 +52,7 @@ export function Hero() {
           <div className="flex items-center gap-2 text-script text-2xl text-primary">
             Step Out. Experience More. <Heart className="h-5 w-5 fill-primary text-primary" />
           </div>
-          <h1 className="mt-4 text-display text-5xl leading-[1.05] font-semibold text-ink sm:text-6xl lg:text-7xl">
+          <h1 className="mt-4 text-display text-4xl leading-[1.05] font-semibold text-ink sm:text-6xl lg:text-7xl">
             Life Gets Better
             <br />
             <span className="text-primary italic">When You Step Out.</span>
@@ -94,39 +84,35 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Right side: hero image + floating logo + side cards */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="relative"
+          className="relative mx-auto w-full max-w-md lg:max-w-none"
         >
           <div className="relative aspect-[5/6] overflow-hidden rounded-[2rem] shadow-luxe">
             <img src={heroImg} alt="Friends gathering at a candle-lit experience" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/15 via-transparent to-transparent" />
           </div>
 
-          {/* floating circular logo */}
-          <div className="animate-float absolute -bottom-6 left-1/2 -translate-x-1/2">
-            <Logo size={128} className="ring-8 ring-background" />
+          <div className="animate-float absolute -bottom-8 left-1/2 -translate-x-1/2">
+            <Logo size={96} className="ring-8 ring-background" />
           </div>
 
-          {/* side category cards */}
-          <div className="absolute -right-4 top-4 hidden flex-col gap-3 sm:flex">
+          {/* side cards only on xl to prevent overflow */}
+          <div className="absolute -right-2 top-4 hidden flex-col gap-3 xl:flex">
             {sideCards.map((c, i) => (
               <motion.div
                 key={c.title}
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + i * 0.1 }}
-                className="flex w-56 items-center gap-3 rounded-2xl glass-card p-2 shadow-card-soft"
+                className="flex w-52 items-center gap-3 rounded-2xl glass-card p-2 shadow-card-soft"
               >
                 <img src={c.img} alt="" className="h-12 w-12 rounded-xl object-cover" loading="lazy" />
                 <div className="min-w-0">
                   <div className="text-sm font-semibold leading-tight text-ink">
-                    {c.title}
-                    <br />
-                    {c.sub}
+                    {c.title}<br />{c.sub}
                   </div>
                   <div className="text-xs font-semibold text-primary">Explore →</div>
                 </div>
