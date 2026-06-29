@@ -20,10 +20,19 @@ function BookingPage() {
   const navigate = useNavigate();
   const [exp, setExp] = useState<any>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
+
   const [seats, setSeats] = useState(1);
   const [contactName, setContactName] = useState("");
+  const [age, setAge] = useState("");
+  const [dob, setDob] = useState("");
+  const [gender, setGender] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [emergency, setEmergency] = useState("");
+  const [city, setCity] = useState("");
+  const [special, setSpecial] = useState("");
+  const [terms, setTerms] = useState(false);
+
   const [upiTxn, setUpiTxn] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -40,9 +49,7 @@ function BookingPage() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="mx-auto max-w-3xl animate-pulse px-6 py-16">
-          <div className="h-64 rounded-3xl bg-rose-soft/40" />
-        </div>
+        <div className="mx-auto max-w-3xl animate-pulse px-6 py-16"><div className="h-64 rounded-3xl bg-rose-soft/40" /></div>
       </div>
     );
   }
@@ -50,11 +57,27 @@ function BookingPage() {
   const total = exp.price_inr * seats;
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(exp.title)}`;
 
+  function validateStep1(): string | null {
+    if (!contactName.trim() || contactName.trim().length < 2) return "Please enter your full name";
+    const ageNum = parseInt(age, 10);
+    if (!ageNum || ageNum < 5 || ageNum > 120) return "Please enter a valid age";
+    if (!dob) return "Please enter your date of birth";
+    if (!gender) return "Please select gender";
+    if (!/^[+0-9 \-]{7,15}$/.test(contactPhone)) return "Please enter a valid mobile number";
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contactEmail)) return "Please enter a valid email";
+    if (!city.trim()) return "Please enter your city";
+    if (!terms) return "Please accept the terms & conditions";
+    return null;
+  }
+
+  function goToPay() {
+    const err = validateStep1();
+    if (err) { toast.error(err); return; }
+    setStep(2);
+  }
+
   async function submitBooking() {
-    if (!file) {
-      toast.error("Please upload your payment screenshot");
-      return;
-    }
+    if (!file) { toast.error("Please upload your payment screenshot"); return; }
     setBusy(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -74,6 +97,13 @@ function BookingPage() {
         contact_name: contactName,
         contact_phone: contactPhone,
         contact_email: contactEmail,
+        age: parseInt(age, 10),
+        date_of_birth: dob,
+        gender,
+        city,
+        emergency_contact: emergency || null,
+        special_requests: special || null,
+        terms_accepted: terms,
       });
       if (insErr) throw insErr;
       toast.success("Booking submitted! We'll verify and confirm within 12 hours.");
@@ -94,17 +124,10 @@ function BookingPage() {
         </Link>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[1.5fr_1fr]">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-card p-7 shadow-card-soft"
-          >
-            <div className="mb-6 flex items-center gap-2">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="rounded-3xl bg-card p-5 shadow-card-soft sm:p-7">
+            <div className="mb-6 flex flex-wrap items-center gap-2">
               {[1, 2, 3].map((n) => (
-                <div key={n} className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-semibold transition ${
-                  step >= n ? "bg-rose-gradient text-primary-foreground" : "bg-rose-soft/40 text-foreground/60"
-                }`}>
+                <div key={n} className={`flex h-8 items-center gap-2 rounded-full px-3 text-xs font-semibold transition ${step >= n ? "bg-rose-gradient text-primary-foreground" : "bg-rose-soft/40 text-foreground/60"}`}>
                   {step > n ? <Check className="h-3.5 w-3.5" /> : <span>{n}</span>}
                   {n === 1 ? "Details" : n === 2 ? "Pay via UPI" : "Verify"}
                 </div>
@@ -114,22 +137,41 @@ function BookingPage() {
             {step === 1 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <h2 className="text-display text-2xl font-semibold text-ink">Your details</h2>
-                <Field label="Full name"><input value={contactName} onChange={(e) => setContactName(e.target.value)} className="input" /></Field>
-                <Field label="Phone (WhatsApp)"><input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="input" placeholder="+91 ..." /></Field>
-                <Field label="Email"><input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" className="input" /></Field>
-                <Field label="Number of seats">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Full name *"><input value={contactName} onChange={(e) => setContactName(e.target.value)} className="input" /></Field>
+                  <Field label="Age *"><input value={age} onChange={(e) => setAge(e.target.value)} type="number" min={5} max={120} className="input" /></Field>
+                  <Field label="Date of birth *"><input value={dob} onChange={(e) => setDob(e.target.value)} type="date" className="input" /></Field>
+                  <Field label="Gender *">
+                    <select value={gender} onChange={(e) => setGender(e.target.value)} className="input">
+                      <option value="">Select…</option>
+                      <option>Female</option><option>Male</option><option>Non-binary</option><option>Prefer not to say</option>
+                    </select>
+                  </Field>
+                  <Field label="Mobile number *"><input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="input" placeholder="+91 ..." /></Field>
+                  <Field label="Email *"><input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" className="input" /></Field>
+                  <Field label="Emergency contact (optional)"><input value={emergency} onChange={(e) => setEmergency(e.target.value)} className="input" placeholder="+91 ..." /></Field>
+                  <Field label="City *"><input value={city} onChange={(e) => setCity(e.target.value)} className="input" /></Field>
+                </div>
+
+                <Field label="Number of tickets">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setSeats(Math.max(1, seats - 1))} className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/50 text-primary">−</button>
+                    <button type="button" onClick={() => setSeats(Math.max(1, seats - 1))} className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/50 text-primary">−</button>
                     <span className="text-display text-xl font-semibold">{seats}</span>
-                    <button onClick={() => setSeats(Math.min(exp.capacity, seats + 1))} className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/50 text-primary">+</button>
+                    <button type="button" onClick={() => setSeats(Math.min(exp.capacity, seats + 1))} className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/50 text-primary">+</button>
                   </div>
                 </Field>
-                <button
-                  disabled={!contactName || !contactPhone || !contactEmail}
-                  onClick={() => setStep(2)}
-                  className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe disabled:opacity-50"
-                >
-                  Continue to payment
+
+                <Field label="Special requests (optional)">
+                  <textarea value={special} onChange={(e) => setSpecial(e.target.value)} rows={3} className="input" placeholder="Dietary needs, accessibility, etc." />
+                </Field>
+
+                <label className="flex items-start gap-3 rounded-2xl bg-rose-soft/20 p-3 text-sm">
+                  <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
+                  <span>I accept the <a href="#" className="font-semibold text-primary">Terms & Conditions</a> and cancellation policy.</span>
+                </label>
+
+                <button onClick={goToPay} className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">
+                  Proceed to payment
                 </button>
               </motion.div>
             )}
@@ -145,10 +187,7 @@ function BookingPage() {
                       <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">UPI ID</div>
                       <div className="text-display text-xl font-semibold text-ink">{UPI_ID}</div>
                     </div>
-                    <button
-                      onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success("UPI ID copied"); }}
-                      className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-xs font-semibold text-primary shadow-card-soft"
-                    >
+                    <button onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success("UPI ID copied"); }} className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-xs font-semibold text-primary shadow-card-soft">
                       <Copy className="h-3.5 w-3.5" /> Copy
                     </button>
                   </div>
@@ -156,20 +195,13 @@ function BookingPage() {
                     <span>Amount</span>
                     <span className="text-display text-lg font-semibold">₹{total.toLocaleString("en-IN")}</span>
                   </div>
-                  <a
-                    href={upiLink}
-                    className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe"
-                  >
+                  <a href={upiLink} className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">
                     Open UPI app to pay
                   </a>
                 </div>
 
                 <div className="grid place-items-center rounded-2xl bg-white p-4">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`}
-                    alt="UPI QR"
-                    className="h-44 w-44"
-                  />
+                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`} alt="UPI QR" className="h-44 w-44" />
                   <div className="mt-2 text-xs text-muted-foreground">Scan with any UPI app</div>
                 </div>
 
@@ -184,24 +216,16 @@ function BookingPage() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <h2 className="text-display text-2xl font-semibold text-ink">Upload payment proof</h2>
                 <Field label="UPI transaction ID (optional)"><input value={upiTxn} onChange={(e) => setUpiTxn(e.target.value)} className="input" placeholder="e.g. 412345678901" /></Field>
-
-                <Field label="Payment screenshot">
+                <Field label="Payment screenshot *">
                   <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-rose-soft/20 px-4 py-8 text-center transition hover:border-primary">
                     <Upload className="h-6 w-6 text-primary" />
-                    <span className="text-sm text-foreground/80">
-                      {file ? file.name : "Click to upload (PNG / JPG)"}
-                    </span>
+                    <span className="text-sm text-foreground/80">{file ? file.name : "Click to upload (PNG / JPG)"}</span>
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
                   </label>
                 </Field>
-
                 <div className="flex gap-3">
                   <button onClick={() => setStep(2)} className="flex-1 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold">Back</button>
-                  <button
-                    onClick={submitBooking}
-                    disabled={!file || busy}
-                    className="flex-1 rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe disabled:opacity-60"
-                  >
+                  <button onClick={submitBooking} disabled={!file || busy} className="flex-1 rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe disabled:opacity-60">
                     {busy ? "Submitting…" : "Submit booking"}
                   </button>
                 </div>
@@ -210,12 +234,7 @@ function BookingPage() {
             )}
           </motion.div>
 
-          <motion.aside
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-3xl bg-card p-6 shadow-luxe lg:sticky lg:top-24 lg:self-start"
-          >
+          <motion.aside initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="rounded-3xl bg-card p-6 shadow-luxe lg:sticky lg:top-24 lg:self-start">
             <img src={imageForExperience(exp.image_url, exp.category)} alt={exp.title} className="h-40 w-full rounded-2xl object-cover" />
             <span className="mt-3 inline-block rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
               {CATEGORIES.find((c) => c.slug === exp.category)?.label ?? exp.category}
@@ -234,7 +253,7 @@ function BookingPage() {
         </div>
       </div>
       <Footer />
-      <style>{`.input{width:100%;border-radius:1rem;border:1px solid var(--border);background:var(--card);padding:.75rem 1rem;font-size:.875rem}.input:focus{outline:none;border-color:var(--primary)}`}</style>
+      <style>{`.input{width:100%;border-radius:1rem;border:1px solid var(--border);background:var(--card);padding:.7rem .9rem;font-size:.875rem}.input:focus{outline:none;border-color:var(--primary)}`}</style>
     </div>
   );
 }
