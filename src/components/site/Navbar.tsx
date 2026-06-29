@@ -71,6 +71,7 @@ export function Navbar() {
               )}
             </AnimatePresence>
           </button>
+          <Link to="/contact" className={link} activeProps={{ className: "text-primary" }}>Contact</Link>
           {user && <Link to="/my-bookings" className={link} activeProps={{ className: "text-primary" }}>My Bookings</Link>}
           {isAdmin && <Link to="/admin" className={`${link} inline-flex items-center gap-1`} activeProps={{ className: "text-primary" }}><ShieldCheck className="h-4 w-4" /> Admin</Link>}
         </nav>

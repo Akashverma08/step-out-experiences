@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ExperiencesRouteImport } from './routes/experiences'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ClaimAdminRouteImport } from './routes/claim-admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -23,6 +24,11 @@ import { Route as AuthenticatedBookIdRouteImport } from './routes/_authenticated
 const ExperiencesRoute = ExperiencesRouteImport.update({
   id: '/experiences',
   path: '/experiences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaimAdminRoute = ClaimAdminRouteImport.update({
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/claim-admin': typeof ClaimAdminRoute
+  '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/claim-admin': typeof ClaimAdminRoute
+  '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/claim-admin': typeof ClaimAdminRoute
+  '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/my-bookings': typeof AuthenticatedMyBookingsRoute
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/claim-admin'
+    | '/contact'
     | '/experiences'
     | '/admin'
     | '/my-bookings'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/claim-admin'
+    | '/contact'
     | '/experiences'
     | '/admin'
     | '/my-bookings'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/claim-admin'
+    | '/contact'
     | '/experiences'
     | '/_authenticated/admin'
     | '/_authenticated/my-bookings'
@@ -147,6 +159,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ClaimAdminRoute: typeof ClaimAdminRoute
+  ContactRoute: typeof ContactRoute
   ExperiencesRoute: typeof ExperiencesRouteWithChildren
   CategorySlugRoute: typeof CategorySlugRoute
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       path: '/experiences'
       fullPath: '/experiences'
       preLoaderRoute: typeof ExperiencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/claim-admin': {
@@ -258,19 +278,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ClaimAdminRoute: ClaimAdminRoute,
+  ContactRoute: ContactRoute,
   ExperiencesRoute: ExperiencesRouteWithChildren,
   CategorySlugRoute: CategorySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

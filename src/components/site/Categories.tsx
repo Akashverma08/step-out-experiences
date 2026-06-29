@@ -7,7 +7,7 @@ const ICONS: Record<string, any> = { Palette, Coffee, Hammer, Users, CalendarHea
 
 export function Categories() {
   return (
-    <section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-10">
+    <section className="mx-auto mt-16 max-w-7xl px-4 pt-8 sm:px-6 lg:px-10 lg:pt-0">
       <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-7">
         {CATEGORIES.map((c, i) => {
           const Icon = ICONS[c.icon] ?? Palette;
