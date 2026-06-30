@@ -8,20 +8,29 @@ import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
 import { toast } from "sonner";
 
+type BookSearch = { seats?: number; coupon?: string };
 export const Route = createFileRoute("/_authenticated/book/$id")({
   component: BookingPage,
+  validateSearch: (s: Record<string, unknown>): BookSearch => ({
+    seats: s.seats ? Math.max(1, parseInt(String(s.seats), 10)) : undefined,
+    coupon: typeof s.coupon === "string" ? s.coupon : undefined,
+  }),
 });
+
+const COUPONS: Record<string, number> = { WELCOME10: 10, ANOUT15: 15, FIRST20: 20 };
 
 const UPI_ID = "anoutandabout@upi";
 const UPI_NAME = "AN Out & About";
 
 function BookingPage() {
   const { id } = Route.useParams();
+  const search = Route.useSearch();
   const navigate = useNavigate();
   const [exp, setExp] = useState<any>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  const [seats, setSeats] = useState(1);
+  const [seats, setSeats] = useState(search.seats ?? 1);
+  const couponPct = search.coupon ? (COUPONS[search.coupon.toUpperCase()] ?? 0) : 0;
   const [contactName, setContactName] = useState("");
   const [age, setAge] = useState("");
   const [dob, setDob] = useState("");
