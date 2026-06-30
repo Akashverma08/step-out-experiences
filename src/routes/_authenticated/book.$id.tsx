@@ -63,7 +63,9 @@ function BookingPage() {
     );
   }
 
-  const total = exp.price_inr * seats;
+  const subtotal = exp.price_inr * seats;
+  const discount = Math.round((subtotal * couponPct) / 100);
+  const total = subtotal - discount;
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(exp.title)}`;
 
   function validateStep1(): string | null {
@@ -96,7 +98,7 @@ function BookingPage() {
       const { error: upErr } = await supabase.storage.from("payment-screenshots").upload(path, file);
       if (upErr) throw upErr;
 
-      const { error: insErr } = await supabase.from("bookings").insert({
+      const { data: inserted, error: insErr } = await supabase.from("bookings").insert({
         user_id: uid,
         experience_id: exp.id,
         seats,
@@ -113,10 +115,10 @@ function BookingPage() {
         emergency_contact: emergency || null,
         special_requests: special || null,
         terms_accepted: terms,
-      });
+      }).select("id").maybeSingle();
       if (insErr) throw insErr;
       toast.success("Booking submitted! We'll verify and confirm within 12 hours.");
-      navigate({ to: "/my-bookings" });
+      navigate({ to: "/booking-success/$id", params: { id: inserted!.id } });
     } catch (err: any) {
       toast.error(err.message ?? "Booking failed");
     } finally {
