@@ -258,6 +258,8 @@ function BookingPage() {
             <div className="mt-5 space-y-2 border-t border-border/60 pt-4 text-sm">
               <Row k="Price / seat" v={`₹${exp.price_inr.toLocaleString("en-IN")}`} />
               <Row k="Seats" v={String(seats)} />
+              <Row k="Subtotal" v={`₹${subtotal.toLocaleString("en-IN")}`} />
+              {discount > 0 && <Row k={`Coupon (${couponPct}%)`} v={`− ₹${discount.toLocaleString("en-IN")}`} />}
               <Row k="Total" v={`₹${total.toLocaleString("en-IN")}`} bold />
             </div>
           </motion.aside>
