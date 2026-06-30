@@ -103,6 +103,27 @@ function MyBookingsPage() {
                     </div>
                   )}
                 </div>
+
+                <button onClick={() => setOpen(open === b.id ? null : b.id)} className="flex w-full items-center justify-center gap-1.5 border-t border-border/60 bg-rose-soft/10 py-2 text-xs font-semibold text-primary">
+                  {open === b.id ? "Hide details" : "View booking details"} <ChevronDown className={`h-3.5 w-3.5 transition ${open === b.id ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence>
+                  {open === b.id && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                      <div className="grid gap-2 border-t border-border/60 p-4 text-xs text-foreground/80 sm:grid-cols-2 sm:p-5">
+                        <Detail k="Booked by" v={b.contact_name} />
+                        <Detail k="Email" v={b.contact_email} />
+                        <Detail k="Mobile" v={b.contact_phone} />
+                        {b.city && <Detail k="City" v={b.city} />}
+                        {b.age && <Detail k="Age" v={String(b.age)} />}
+                        {b.gender && <Detail k="Gender" v={b.gender} />}
+                        {b.emergency_contact && <Detail k="Emergency contact" v={b.emergency_contact} />}
+                        {b.special_requests && <Detail k="Special requests" v={b.special_requests} />}
+                        <Detail k="Booked on" v={new Date(b.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             ))}
           </div>
