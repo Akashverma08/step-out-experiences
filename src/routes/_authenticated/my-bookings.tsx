@@ -134,6 +134,15 @@ function MyBookingsPage() {
   );
 }
 
+function Detail({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="rounded-xl bg-rose-soft/20 p-2.5">
+      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{k}</div>
+      <div className="text-foreground/90">{v}</div>
+    </div>
+  );
+}
+
 function StatusBadge({ status }: { status: string }) {
   const map = {
     pending: { Icon: Clock, label: "Pending verification", cls: "bg-gold/30 text-ink" },
