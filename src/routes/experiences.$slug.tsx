@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Calendar, MapPin, Users, Sparkles, Check, ArrowLeft, Clock, Shirt, ShieldAlert, Package, ExternalLink, ChevronDown, Star } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, MapPin, Users, Sparkles, Check, ArrowLeft, Clock, Shirt, ShieldAlert, Package, ExternalLink, ChevronDown, Star, Heart, Share2, X, Plus, Minus, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/experiences/$slug")({
   head: () => ({
@@ -31,6 +32,8 @@ type Exp = {
   cancellation_policy: string | null;
 };
 
+const COUPONS: Record<string, number> = { WELCOME10: 10, ANOUT15: 15, FIRST20: 20 };
+
 function ExperienceDetail() {
   const { slug } = Route.useParams();
   const navigate = useNavigate();
@@ -40,6 +43,12 @@ function ExperienceDetail() {
   const [seatsBooked, setSeatsBooked] = useState(0);
   const [similar, setSimilar] = useState<any[]>([]);
   const [activeImg, setActiveImg] = useState<string>("");
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [wished, setWished] = useState(false);
+
+  const [tickets, setTickets] = useState(1);
+  const [coupon, setCoupon] = useState("");
+  const [couponPct, setCouponPct] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
@@ -49,6 +58,7 @@ function ExperienceDetail() {
       setLoading(false);
       if (e) {
         setActiveImg(imageForExperience(e.image_url, e.category));
+        try { setWished(JSON.parse(localStorage.getItem("anout_wishlist") || "[]").includes(e.id)); } catch {}
         const { data: bks } = await supabase.from("bookings").select("seats").eq("experience_id", e.id).in("status", ["pending", "approved"]);
         setSeatsBooked((bks ?? []).reduce((s, b: any) => s + (b.seats ?? 0), 0));
         const { data: sims } = await supabase.from("experiences").select("id,slug,title,category,image_url,date,location,city,price_inr").eq("category", e.category).neq("id", e.id).eq("is_published", true).limit(3);
@@ -56,6 +66,11 @@ function ExperienceDetail() {
       }
     });
   }, [slug]);
+
+  const gallery = useMemo(() => {
+    if (!exp) return [];
+    return [imageForExperience(exp.image_url, exp.category), ...(exp.gallery ?? []).filter(Boolean)];
+  }, [exp]);
 
   if (loading) {
     return (
@@ -79,18 +94,59 @@ function ExperienceDetail() {
     );
   }
 
-  const heroImg = imageForExperience(exp.image_url, exp.category);
-  const gallery = [heroImg, ...(exp.gallery ?? []).filter(Boolean)];
   const dateStr = new Date(exp.date).toLocaleString("en-IN", { dateStyle: "full", timeStyle: "short" });
+  const timeStr = new Date(exp.date).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
   const catLabel = CATEGORIES.find((c) => c.slug === exp.category)?.label ?? exp.category;
   const seatsLeft = Math.max(0, exp.capacity - seatsBooked);
   const soldOut = seatsLeft === 0;
   const mapLink = exp.map_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${exp.location}, ${exp.city}`)}`;
 
+  const subtotal = exp.price_inr * tickets;
+  const discount = Math.round((subtotal * couponPct) / 100);
+  const total = subtotal - discount;
+
   function handleBook() {
     if (!authed) { navigate({ to: "/auth" }); return; }
-    navigate({ to: "/book/$id", params: { id: exp!.id } });
+    navigate({ to: "/book/$id", params: { id: exp!.id }, search: { seats: tickets, coupon: couponPct ? coupon.toUpperCase() : undefined } as any });
   }
+
+  function toggleWish() {
+    try {
+      const arr: string[] = JSON.parse(localStorage.getItem("anout_wishlist") || "[]");
+      const next = arr.includes(exp!.id) ? arr.filter((x) => x !== exp!.id) : [...arr, exp!.id];
+      localStorage.setItem("anout_wishlist", JSON.stringify(next));
+      setWished(next.includes(exp!.id));
+      toast.success(next.includes(exp!.id) ? "Added to wishlist" : "Removed from wishlist");
+    } catch {}
+  }
+
+  async function handleShare() {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (navigator.share) await navigator.share({ title: exp!.title, text: exp!.subtitle ?? "", url });
+      else { await navigator.clipboard.writeText(url); toast.success("Link copied"); }
+    } catch {}
+  }
+
+  function applyCoupon() {
+    const code = coupon.trim().toUpperCase();
+    const pct = COUPONS[code];
+    if (!pct) { setCouponPct(0); toast.error("Invalid coupon"); return; }
+    setCouponPct(pct);
+    toast.success(`Coupon applied — ${pct}% off`);
+  }
+
+  // Timeline derived from start date
+  const start = new Date(exp.date);
+  const dur = exp.duration_minutes ?? 120;
+  const tl = [
+    { off: 0, label: "Welcome & check-in" },
+    { off: Math.round(dur * 0.15), label: "Ice-breaking" },
+    { off: Math.round(dur * 0.35), label: "Main experience begins" },
+    { off: Math.round(dur * 0.75), label: "Networking & refreshments" },
+    { off: dur, label: "Wrap-up & group photo" },
+  ];
+  const fmtTime = (m: number) => new Date(start.getTime() + m * 60000).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,13 +154,28 @@ function ExperienceDetail() {
 
       <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className="relative">
         <div className="relative h-[55vh] min-h-[400px] w-full overflow-hidden">
-          <motion.img key={activeImg} src={activeImg} alt={exp.title} className="h-full w-full object-cover" initial={{ scale: 1.05, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8 }} />
+          <motion.img key={activeImg} src={activeImg} alt={exp.title} className="h-full w-full cursor-zoom-in object-cover" onClick={() => setLightbox(activeImg)} initial={{ scale: 1.05, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8 }} />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
+
+          <div className="absolute right-4 top-4 flex gap-2 sm:right-6 lg:right-10">
+            <button onClick={toggleWish} aria-label="Wishlist" className={`grid h-10 w-10 place-items-center rounded-full backdrop-blur transition ${wished ? "bg-primary text-primary-foreground" : "bg-white/90 text-ink hover:bg-white"}`}>
+              <Heart className={`h-4 w-4 ${wished ? "fill-current" : ""}`} />
+            </button>
+            <button onClick={handleShare} aria-label="Share" className="grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ink backdrop-blur transition hover:bg-white">
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
+
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-10">
             <Link to="/experiences" className="inline-flex items-center gap-2 text-sm font-semibold text-cream/90 hover:text-cream">
               <ArrowLeft className="h-4 w-4" /> All experiences
             </Link>
-            <span className="mt-4 inline-block rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-luxe">{catLabel}</span>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-luxe">{catLabel}</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-ink">
+                <Star className="h-3 w-3 fill-gold text-gold" /> 4.9 · 128 reviews
+              </span>
+            </div>
             <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15, duration: 0.6 }}
               className="mt-3 max-w-3xl text-display text-4xl font-semibold leading-tight text-cream sm:text-5xl lg:text-6xl">
               {exp.title}
@@ -116,7 +187,7 @@ function ExperienceDetail() {
         {gallery.length > 1 && (
           <div className="mx-auto -mt-6 flex max-w-7xl gap-3 overflow-x-auto px-4 pb-2 sm:px-6 lg:px-10">
             {gallery.map((g, i) => (
-              <button key={i} onClick={() => setActiveImg(g)} className={`relative h-20 w-28 shrink-0 overflow-hidden rounded-2xl ring-2 transition ${activeImg === g ? "ring-primary" : "ring-transparent hover:ring-primary/40"}`}>
+              <button key={i} onClick={() => setActiveImg(g)} onDoubleClick={() => setLightbox(g)} className={`relative h-20 w-28 shrink-0 overflow-hidden rounded-2xl ring-2 transition ${activeImg === g ? "ring-primary" : "ring-transparent hover:ring-primary/40"}`}>
                 <img src={g} alt="" className="h-full w-full object-cover" />
               </button>
             ))}
@@ -149,6 +220,18 @@ function ExperienceDetail() {
             </>
           )}
 
+          {/* What you'll do — timeline */}
+          <h3 className="mt-10 text-display text-2xl font-semibold text-ink">What you'll do</h3>
+          <ol className="mt-4 space-y-3 border-l-2 border-rose-soft pl-5">
+            {tl.map((t, i) => (
+              <li key={i} className="relative">
+                <span className="absolute -left-[27px] top-1.5 grid h-4 w-4 place-items-center rounded-full bg-rose-gradient text-[9px] font-bold text-primary-foreground">{i + 1}</span>
+                <div className="text-xs font-semibold text-primary">{fmtTime(t.off)}</div>
+                <div className="text-sm text-foreground/85">{t.label}</div>
+              </li>
+            ))}
+          </ol>
+
           {exp.whats_included?.length > 0 && (
             <>
               <h3 className="mt-10 text-display text-2xl font-semibold text-ink">What's included</h3>
@@ -176,12 +259,8 @@ function ExperienceDetail() {
           )}
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {exp.dress_code && (
-              <InfoCard icon={<Shirt className="h-4 w-4" />} title="Dress code" body={exp.dress_code} />
-            )}
-            {exp.age_requirement && (
-              <InfoCard icon={<ShieldAlert className="h-4 w-4" />} title="Age requirement" body={exp.age_requirement} />
-            )}
+            {exp.dress_code && <InfoCard icon={<Shirt className="h-4 w-4" />} title="Dress code" body={exp.dress_code} />}
+            {exp.age_requirement && <InfoCard icon={<ShieldAlert className="h-4 w-4" />} title="Age requirement" body={exp.age_requirement} />}
           </div>
 
           <div className="mt-10 rounded-3xl bg-card p-6 shadow-card-soft">
@@ -192,19 +271,18 @@ function ExperienceDetail() {
               </a>
             </div>
             <p className="mt-2 text-sm text-foreground/80">{exp.location}, {exp.city}</p>
-            <iframe
-              title="Map"
-              loading="lazy"
-              className="mt-4 h-72 w-full rounded-2xl border border-border"
-              src={`https://www.google.com/maps?q=${encodeURIComponent(`${exp.location}, ${exp.city}`)}&output=embed`}
-            />
+            <iframe title="Map" loading="lazy" className="mt-4 h-72 w-full rounded-2xl border border-border"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(`${exp.location}, ${exp.city}`)}&output=embed`} />
           </div>
 
           {exp.host_name && (
-            <div className="mt-10 rounded-3xl bg-rose-soft/30 p-6">
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Meet your host</div>
-              <h3 className="mt-1 text-display text-2xl font-semibold text-ink">{exp.host_name}</h3>
-              {exp.host_bio && <p className="mt-2 text-sm text-foreground/80">{exp.host_bio}</p>}
+            <div className="mt-10 flex items-start gap-4 rounded-3xl bg-rose-soft/30 p-6">
+              <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-rose-gradient text-2xl font-bold text-primary-foreground">{exp.host_name[0]}</div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Meet your host</div>
+                <h3 className="mt-1 text-display text-2xl font-semibold text-ink">{exp.host_name}</h3>
+                {exp.host_bio && <p className="mt-2 text-sm text-foreground/80">{exp.host_bio}</p>}
+              </div>
             </div>
           )}
 
@@ -241,6 +319,7 @@ function ExperienceDetail() {
           </div>
         </motion.div>
 
+        {/* Sticky booking card */}
         <motion.aside initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-3xl bg-card p-6 shadow-luxe">
             <div className="text-display text-4xl font-semibold text-ink">
@@ -249,16 +328,47 @@ function ExperienceDetail() {
             </div>
             <p className="mt-1 text-xs text-muted-foreground">All inclusive · GST extra if applicable</p>
 
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-rose-soft/50 px-3 py-1 text-xs font-semibold text-primary">
-              <Users className="h-3.5 w-3.5" />
-              {soldOut ? "Sold out" : `${seatsLeft} seat${seatsLeft === 1 ? "" : "s"} left`}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-rose-soft/50 px-3 py-1 text-xs font-semibold text-primary">
+                <Users className="h-3.5 w-3.5" />{soldOut ? "Sold out" : `${seatsLeft} seat${seatsLeft === 1 ? "" : "s"} left`}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-rose-soft/30 px-3 py-1 text-xs font-semibold text-ink">
+                <Clock className="h-3.5 w-3.5 text-primary" />{timeStr}
+              </span>
             </div>
 
-            <button
-              onClick={handleBook}
-              disabled={soldOut}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-            >
+            <div className="mt-5 rounded-2xl border border-border/70 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tickets</span>
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => setTickets(Math.max(1, tickets - 1))} aria-label="Decrease" className="grid h-8 w-8 place-items-center rounded-full bg-rose-soft/50 text-primary"><Minus className="h-3.5 w-3.5" /></button>
+                  <span className="text-display text-lg font-semibold">{tickets}</span>
+                  <button type="button" onClick={() => setTickets(Math.min(seatsLeft || 1, tickets + 1))} aria-label="Increase" className="grid h-8 w-8 place-items-center rounded-full bg-rose-soft/50 text-primary"><Plus className="h-3.5 w-3.5" /></button>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Tag className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary" />
+                  <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Coupon code"
+                    className="w-full rounded-full border border-border bg-background py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary" />
+                </div>
+                <button onClick={applyCoupon} className="rounded-full bg-ink px-3 py-2 text-xs font-semibold text-cream">Apply</button>
+              </div>
+              {couponPct > 0 && <div className="mt-2 text-[11px] font-semibold text-primary">✓ {coupon.toUpperCase()} — {couponPct}% off</div>}
+
+              <div className="mt-4 space-y-1.5 border-t border-border/60 pt-3 text-xs">
+                <Row k={`₹${exp.price_inr.toLocaleString("en-IN")} × ${tickets}`} v={`₹${subtotal.toLocaleString("en-IN")}`} />
+                {discount > 0 && <Row k={`Discount (${couponPct}%)`} v={`− ₹${discount.toLocaleString("en-IN")}`} />}
+                <div className="flex items-center justify-between border-t border-border/60 pt-2">
+                  <span className="text-sm font-semibold text-ink">Total</span>
+                  <span className="text-display text-xl font-semibold text-ink">₹{total.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={handleBook} disabled={soldOut}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60">
               {soldOut ? "Sold out" : "Book Now"}
             </button>
             {!authed && !soldOut && <p className="mt-3 text-center text-xs text-muted-foreground">You'll be asked to sign in first.</p>}
@@ -291,7 +401,29 @@ function ExperienceDetail() {
         </section>
       )}
 
+      {/* Mobile sticky book bar */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-card/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total</div>
+            <div className="text-display text-lg font-semibold text-ink">₹{total.toLocaleString("en-IN")}</div>
+          </div>
+          <button onClick={handleBook} disabled={soldOut} className="rounded-full bg-rose-gradient px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-luxe disabled:opacity-60">
+            {soldOut ? "Sold out" : "Book Now"}
+          </button>
+        </div>
+      </div>
+
       <Footer />
+
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightbox(null)} className="fixed inset-0 z-50 grid place-items-center bg-ink/90 p-4">
+            <button onClick={() => setLightbox(null)} className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-ink"><X className="h-4 w-4" /></button>
+            <motion.img initial={{ scale: 0.95 }} animate={{ scale: 1 }} src={lightbox} alt="" className="max-h-[88vh] max-w-[95vw] rounded-2xl object-contain" />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -312,6 +444,14 @@ function InfoCard({ icon, title, body }: { icon: React.ReactNode; title: string;
     <div className="rounded-2xl bg-card p-5 shadow-card-soft">
       <div className="flex items-center gap-2 text-primary">{icon}<span className="text-xs font-semibold uppercase tracking-[0.18em]">{title}</span></div>
       <p className="mt-2 text-sm text-foreground/80">{body}</p>
+    </div>
+  );
+}
+
+function Row({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between text-foreground/80">
+      <span>{k}</span><span className="font-semibold text-ink">{v}</span>
     </div>
   );
 }
