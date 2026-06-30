@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/my-bookings")({
 function MyBookingsPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
