@@ -19,6 +19,7 @@ import { Route as ExperiencesSlugRouteImport } from './routes/experiences.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as AuthenticatedMyBookingsRouteImport } from './routes/_authenticated/my-bookings'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedBookingSuccessIdRouteImport } from './routes/_authenticated/booking-success.$id'
 import { Route as AuthenticatedBookIdRouteImport } from './routes/_authenticated/book.$id'
 
 const ExperiencesRoute = ExperiencesRouteImport.update({
@@ -70,6 +71,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBookingSuccessIdRoute =
+  AuthenticatedBookingSuccessIdRouteImport.update({
+    id: '/booking-success/$id',
+    path: '/booking-success/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBookIdRoute = AuthenticatedBookIdRouteImport.update({
   id: '/book/$id',
   path: '/book/$id',
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
   '/book/$id': typeof AuthenticatedBookIdRoute
+  '/booking-success/$id': typeof AuthenticatedBookingSuccessIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
   '/book/$id': typeof AuthenticatedBookIdRoute
+  '/booking-success/$id': typeof AuthenticatedBookingSuccessIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,6 +122,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
   '/_authenticated/book/$id': typeof AuthenticatedBookIdRoute
+  '/_authenticated/booking-success/$id': typeof AuthenticatedBookingSuccessIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/experiences/$slug'
     | '/book/$id'
+    | '/booking-success/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/experiences/$slug'
     | '/book/$id'
+    | '/booking-success/$id'
   id:
     | '__root__'
     | '/'
@@ -152,6 +164,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/experiences/$slug'
     | '/_authenticated/book/$id'
+    | '/_authenticated/booking-success/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/booking-success/$id': {
+      id: '/_authenticated/booking-success/$id'
+      path: '/booking-success/$id'
+      fullPath: '/booking-success/$id'
+      preLoaderRoute: typeof AuthenticatedBookingSuccessIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/book/$id': {
       id: '/_authenticated/book/$id'
       path: '/book/$id'
@@ -250,12 +270,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedMyBookingsRoute: typeof AuthenticatedMyBookingsRoute
   AuthenticatedBookIdRoute: typeof AuthenticatedBookIdRoute
+  AuthenticatedBookingSuccessIdRoute: typeof AuthenticatedBookingSuccessIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedMyBookingsRoute: AuthenticatedMyBookingsRoute,
   AuthenticatedBookIdRoute: AuthenticatedBookIdRoute,
+  AuthenticatedBookingSuccessIdRoute: AuthenticatedBookingSuccessIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

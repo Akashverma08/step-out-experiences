@@ -8,20 +8,29 @@ import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
 import { toast } from "sonner";
 
+type BookSearch = { seats?: number; coupon?: string };
 export const Route = createFileRoute("/_authenticated/book/$id")({
   component: BookingPage,
+  validateSearch: (s: Record<string, unknown>): BookSearch => ({
+    seats: s.seats ? Math.max(1, parseInt(String(s.seats), 10)) : undefined,
+    coupon: typeof s.coupon === "string" ? s.coupon : undefined,
+  }),
 });
+
+const COUPONS: Record<string, number> = { WELCOME10: 10, ANOUT15: 15, FIRST20: 20 };
 
 const UPI_ID = "anoutandabout@upi";
 const UPI_NAME = "AN Out & About";
 
 function BookingPage() {
   const { id } = Route.useParams();
+  const search = Route.useSearch();
   const navigate = useNavigate();
   const [exp, setExp] = useState<any>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  const [seats, setSeats] = useState(1);
+  const [seats, setSeats] = useState(search.seats ?? 1);
+  const couponPct = search.coupon ? (COUPONS[search.coupon.toUpperCase()] ?? 0) : 0;
   const [contactName, setContactName] = useState("");
   const [age, setAge] = useState("");
   const [dob, setDob] = useState("");
@@ -54,7 +63,9 @@ function BookingPage() {
     );
   }
 
-  const total = exp.price_inr * seats;
+  const subtotal = exp.price_inr * seats;
+  const discount = Math.round((subtotal * couponPct) / 100);
+  const total = subtotal - discount;
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(exp.title)}`;
 
   function validateStep1(): string | null {
@@ -87,7 +98,7 @@ function BookingPage() {
       const { error: upErr } = await supabase.storage.from("payment-screenshots").upload(path, file);
       if (upErr) throw upErr;
 
-      const { error: insErr } = await supabase.from("bookings").insert({
+      const { data: inserted, error: insErr } = await supabase.from("bookings").insert({
         user_id: uid,
         experience_id: exp.id,
         seats,
@@ -104,10 +115,10 @@ function BookingPage() {
         emergency_contact: emergency || null,
         special_requests: special || null,
         terms_accepted: terms,
-      });
+      }).select("id").maybeSingle();
       if (insErr) throw insErr;
       toast.success("Booking submitted! We'll verify and confirm within 12 hours.");
-      navigate({ to: "/my-bookings" });
+      navigate({ to: "/booking-success/$id", params: { id: inserted!.id } });
     } catch (err: any) {
       toast.error(err.message ?? "Booking failed");
     } finally {
@@ -247,6 +258,8 @@ function BookingPage() {
             <div className="mt-5 space-y-2 border-t border-border/60 pt-4 text-sm">
               <Row k="Price / seat" v={`₹${exp.price_inr.toLocaleString("en-IN")}`} />
               <Row k="Seats" v={String(seats)} />
+              <Row k="Subtotal" v={`₹${subtotal.toLocaleString("en-IN")}`} />
+              {discount > 0 && <Row k={`Coupon (${couponPct}%)`} v={`− ₹${discount.toLocaleString("en-IN")}`} />}
               <Row k="Total" v={`₹${total.toLocaleString("en-IN")}`} bold />
             </div>
           </motion.aside>
