@@ -6,13 +6,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 import { useAuth } from "@/lib/useAuth";
+import { useCartCount } from "@/lib/cart";
 import { toast } from "sonner";
+
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAdmin } = useAuth();
+  const cartCount = useCartCount();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -106,9 +109,16 @@ export function Navbar() {
               <UserRound className="h-4 w-4" /> Login / Signup
             </Link>
           )}
-          <Link to="/experiences" className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card hover:bg-accent transition">
-            <ShoppingBag className="h-4 w-4" />
-          </Link>
+          {user && (
+            <Link to="/cart" aria-label="Cart" className="relative grid h-10 w-10 place-items-center rounded-full border border-border bg-card hover:bg-accent transition">
+              <ShoppingBag className="h-4 w-4" />
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-[20px] place-items-center rounded-full bg-rose-gradient px-1 text-[10px] font-bold text-primary-foreground shadow-luxe">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          )}
         </div>
       </div>
     </header>

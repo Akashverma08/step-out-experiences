@@ -18,6 +18,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExperiencesSlugRouteImport } from './routes/experiences.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as AuthenticatedMyBookingsRouteImport } from './routes/_authenticated/my-bookings'
+import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
+import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBookingSuccessIdRouteImport } from './routes/_authenticated/booking-success.$id'
 import { Route as AuthenticatedBookIdRouteImport } from './routes/_authenticated/book.$id'
@@ -66,6 +68,16 @@ const AuthenticatedMyBookingsRoute = AuthenticatedMyBookingsRouteImport.update({
   path: '/my-bookings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCartRoute = AuthenticatedCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -90,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
+  '/cart': typeof AuthenticatedCartRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
@@ -103,6 +117,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
+  '/cart': typeof AuthenticatedCartRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
@@ -118,6 +134,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/experiences': typeof ExperiencesRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/cart': typeof AuthenticatedCartRoute
+  '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/my-bookings': typeof AuthenticatedMyBookingsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/experiences/$slug': typeof ExperiencesSlugRoute
@@ -133,6 +151,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/experiences'
     | '/admin'
+    | '/cart'
+    | '/checkout'
     | '/my-bookings'
     | '/category/$slug'
     | '/experiences/$slug'
@@ -146,6 +166,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/experiences'
     | '/admin'
+    | '/cart'
+    | '/checkout'
     | '/my-bookings'
     | '/category/$slug'
     | '/experiences/$slug'
@@ -160,6 +182,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/experiences'
     | '/_authenticated/admin'
+    | '/_authenticated/cart'
+    | '/_authenticated/checkout'
     | '/_authenticated/my-bookings'
     | '/category/$slug'
     | '/experiences/$slug'
@@ -242,6 +266,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyBookingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/checkout': {
+      id: '/_authenticated/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof AuthenticatedCheckoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cart': {
+      id: '/_authenticated/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof AuthenticatedCartRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -268,6 +306,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedCartRoute: typeof AuthenticatedCartRoute
+  AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedMyBookingsRoute: typeof AuthenticatedMyBookingsRoute
   AuthenticatedBookIdRoute: typeof AuthenticatedBookIdRoute
   AuthenticatedBookingSuccessIdRoute: typeof AuthenticatedBookingSuccessIdRoute
@@ -275,6 +315,8 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedCartRoute: AuthenticatedCartRoute,
+  AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedMyBookingsRoute: AuthenticatedMyBookingsRoute,
   AuthenticatedBookIdRoute: AuthenticatedBookIdRoute,
   AuthenticatedBookingSuccessIdRoute: AuthenticatedBookingSuccessIdRoute,
