@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { computeTotals, COUPONS } from "@/lib/cart";
 import { toast } from "sonner";
 
 type BookSearch = { seats?: number; coupon?: string };
@@ -17,10 +18,10 @@ export const Route = createFileRoute("/_authenticated/book/$id")({
   }),
 });
 
-const COUPONS: Record<string, number> = { WELCOME10: 10, ANOUT15: 15, FIRST20: 20 };
-
 const UPI_ID = "anoutandabout@upi";
 const UPI_NAME = "AN Out & About";
+
+type Billing = { name: string; email: string; phone: string; address: string; city: string; state: string; pincode: string };
 
 function BookingPage() {
   const { id } = Route.useParams();
@@ -41,6 +42,7 @@ function BookingPage() {
   const [city, setCity] = useState("");
   const [special, setSpecial] = useState("");
   const [terms, setTerms] = useState(false);
+  const [billing, setBilling] = useState<Billing | null>(null);
 
   const [upiTxn, setUpiTxn] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -52,7 +54,24 @@ function BookingPage() {
       setContactEmail(data.user?.email ?? "");
       setContactName((data.user?.user_metadata as any)?.display_name ?? "");
     });
+    // Prefill from checkout if user came through /checkout
+    try {
+      const raw = sessionStorage.getItem("anout_checkout");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.event === id && Date.now() - parsed.ts < 60 * 60 * 1000) {
+          const b: Billing = parsed.billing;
+          setBilling(b);
+          setContactName(b.name);
+          setContactEmail(b.email);
+          setContactPhone(b.phone);
+          setCity(b.city);
+          setTerms(true);
+        }
+      }
+    } catch {}
   }, [id]);
+
 
   if (!exp) {
     return (
@@ -63,9 +82,10 @@ function BookingPage() {
     );
   }
 
-  const subtotal = exp.price_inr * seats;
-  const discount = Math.round((subtotal * couponPct) / 100);
-  const total = subtotal - discount;
+  const totals = computeTotals(exp.price_inr, seats, couponPct);
+  const total = totals.total;
+  const subtotal = totals.subtotal;
+  const discount = totals.discount;
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(exp.title)}`;
 
   function validateStep1(): string | null {
@@ -98,7 +118,7 @@ function BookingPage() {
       const { error: upErr } = await supabase.storage.from("payment-screenshots").upload(path, file);
       if (upErr) throw upErr;
 
-      const { data: inserted, error: insErr } = await supabase.from("bookings").insert({
+      const insertPayload: any = {
         user_id: uid,
         experience_id: exp.id,
         seats,
@@ -115,8 +135,27 @@ function BookingPage() {
         emergency_contact: emergency || null,
         special_requests: special || null,
         terms_accepted: terms,
-      }).select("id").maybeSingle();
+        gst_inr: totals.gst,
+        platform_fee_inr: totals.platformFee,
+        discount_inr: totals.discount,
+        coupon_code: search.coupon ?? null,
+      };
+      if (billing) {
+        insertPayload.billing_address = billing.address;
+        insertPayload.billing_state = billing.state;
+        insertPayload.billing_pincode = billing.pincode;
+      }
+
+      const { data: inserted, error: insErr } = await (supabase as any).from("bookings").insert(insertPayload).select("id").maybeSingle();
       if (insErr) throw insErr;
+
+      // Clear this event from cart + checkout snapshot
+      try {
+        await (supabase as any).from("cart_items").delete().eq("user_id", uid).eq("experience_id", exp.id);
+        window.dispatchEvent(new CustomEvent("cart:changed"));
+        sessionStorage.removeItem("anout_checkout");
+      } catch {}
+
       toast.success("Booking submitted! We'll verify and confirm within 12 hours.");
       navigate({ to: "/booking-success/$id", params: { id: inserted!.id } });
     } catch (err: any) {
@@ -125,6 +164,7 @@ function BookingPage() {
       setBusy(false);
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -260,6 +300,8 @@ function BookingPage() {
               <Row k="Seats" v={String(seats)} />
               <Row k="Subtotal" v={`₹${subtotal.toLocaleString("en-IN")}`} />
               {discount > 0 && <Row k={`Coupon (${couponPct}%)`} v={`− ₹${discount.toLocaleString("en-IN")}`} />}
+              <Row k="GST (5%)" v={`₹${totals.gst.toLocaleString("en-IN")}`} />
+              <Row k="Platform fee" v={`₹${totals.platformFee.toLocaleString("en-IN")}`} />
               <Row k="Total" v={`₹${total.toLocaleString("en-IN")}`} bold />
             </div>
           </motion.aside>

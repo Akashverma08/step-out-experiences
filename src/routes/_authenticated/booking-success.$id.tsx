@@ -20,7 +20,7 @@ function SuccessPage() {
 
   if (!b) return <div className="min-h-screen bg-background"><Navbar /><div className="mx-auto max-w-2xl animate-pulse px-6 py-16"><div className="h-64 rounded-3xl bg-rose-soft/40" /></div></div>;
 
-  const bookingId = b.id.slice(0, 8).toUpperCase();
+  const bookingId = b.booking_number ?? b.id.slice(0, 8).toUpperCase();
   const qrData = encodeURIComponent(JSON.stringify({ id: b.id, exp: b.experiences.slug, seats: b.seats, name: b.contact_name }));
   const qrSmall = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${qrData}`;
   const qrLarge = `https://api.qrserver.com/v1/create-qr-code/?size=800x800&data=${qrData}`;

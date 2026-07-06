@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, Users, Sparkles, Check, ArrowLeft, Clock, Shirt, ShieldAlert, Package, ExternalLink, ChevronDown, Star, Heart, Share2, X, Plus, Minus, Tag } from "lucide-react";
+import { Calendar, MapPin, Users, Sparkles, Check, ArrowLeft, Clock, Shirt, ShieldAlert, Package, ExternalLink, ChevronDown, Star, Heart, Share2, X, Plus, Minus, Tag, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { addToCart } from "@/lib/cart";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/experiences/$slug")({
   head: () => ({
@@ -107,7 +109,15 @@ function ExperienceDetail() {
 
   function handleBook() {
     if (!authed) { navigate({ to: "/auth" }); return; }
-    navigate({ to: "/book/$id", params: { id: exp!.id }, search: { seats: tickets, coupon: couponPct ? coupon.toUpperCase() : undefined } as any });
+    navigate({ to: "/checkout", search: { event: exp!.id, seats: tickets, coupon: couponPct ? coupon.toUpperCase() : undefined } as any });
+  }
+
+  async function handleAddToCart() {
+    if (!authed) { navigate({ to: "/auth" }); return; }
+    try {
+      await addToCart(exp!.id, tickets);
+      toast.success(`Added ${tickets} to cart`);
+    } catch (e: any) { toast.error(e.message ?? "Could not add to cart"); }
   }
 
   function toggleWish() {
@@ -370,6 +380,10 @@ function ExperienceDetail() {
             <button onClick={handleBook} disabled={soldOut}
               className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60">
               {soldOut ? "Sold out" : "Book Now"}
+            </button>
+            <button onClick={handleAddToCart} disabled={soldOut}
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-card px-5 py-3 text-sm font-semibold text-primary transition hover:bg-rose-soft/40 disabled:cursor-not-allowed disabled:opacity-60">
+              <ShoppingBag className="h-4 w-4" /> Add to Cart
             </button>
             {!authed && !soldOut && <p className="mt-3 text-center text-xs text-muted-foreground">You'll be asked to sign in first.</p>}
 

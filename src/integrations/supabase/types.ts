@@ -19,17 +19,25 @@ export type Database = {
           admin_note: string | null
           age: number | null
           amount_inr: number
+          billing_address: string | null
+          billing_pincode: string | null
+          billing_state: string | null
+          booking_number: string | null
           city: string | null
           contact_email: string
           contact_name: string
           contact_phone: string
+          coupon_code: string | null
           created_at: string
           date_of_birth: string | null
+          discount_inr: number
           emergency_contact: string | null
           experience_id: string
           gender: string | null
+          gst_inr: number
           id: string
           payment_screenshot_url: string | null
+          platform_fee_inr: number
           seats: number
           special_requests: string | null
           status: Database["public"]["Enums"]["booking_status"]
@@ -42,17 +50,25 @@ export type Database = {
           admin_note?: string | null
           age?: number | null
           amount_inr: number
+          billing_address?: string | null
+          billing_pincode?: string | null
+          billing_state?: string | null
+          booking_number?: string | null
           city?: string | null
           contact_email: string
           contact_name: string
           contact_phone: string
+          coupon_code?: string | null
           created_at?: string
           date_of_birth?: string | null
+          discount_inr?: number
           emergency_contact?: string | null
           experience_id: string
           gender?: string | null
+          gst_inr?: number
           id?: string
           payment_screenshot_url?: string | null
+          platform_fee_inr?: number
           seats?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -65,17 +81,25 @@ export type Database = {
           admin_note?: string | null
           age?: number | null
           amount_inr?: number
+          billing_address?: string | null
+          billing_pincode?: string | null
+          billing_state?: string | null
+          booking_number?: string | null
           city?: string | null
           contact_email?: string
           contact_name?: string
           contact_phone?: string
+          coupon_code?: string | null
           created_at?: string
           date_of_birth?: string | null
+          discount_inr?: number
           emergency_contact?: string | null
           experience_id?: string
           gender?: string | null
+          gst_inr?: number
           id?: string
           payment_screenshot_url?: string | null
+          platform_fee_inr?: number
           seats?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -87,6 +111,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cart_items: {
+        Row: {
+          created_at: string
+          experience_id: string
+          id: string
+          quantity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          experience_id: string
+          id?: string
+          quantity?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          experience_id?: string
+          id?: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_experience_id_fkey"
             columns: ["experience_id"]
             isOneToOne: false
             referencedRelation: "experiences"
@@ -281,6 +340,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      seats_left: { Args: { _experience_id: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user"
