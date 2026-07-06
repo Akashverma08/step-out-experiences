@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { computeTotals, COUPONS } from "@/lib/cart";
 import { toast } from "sonner";
 
 type BookSearch = { seats?: number; coupon?: string };
@@ -17,10 +18,10 @@ export const Route = createFileRoute("/_authenticated/book/$id")({
   }),
 });
 
-const COUPONS: Record<string, number> = { WELCOME10: 10, ANOUT15: 15, FIRST20: 20 };
-
 const UPI_ID = "anoutandabout@upi";
 const UPI_NAME = "AN Out & About";
+
+type Billing = { name: string; email: string; phone: string; address: string; city: string; state: string; pincode: string };
 
 function BookingPage() {
   const { id } = Route.useParams();
@@ -41,6 +42,7 @@ function BookingPage() {
   const [city, setCity] = useState("");
   const [special, setSpecial] = useState("");
   const [terms, setTerms] = useState(false);
+  const [billing, setBilling] = useState<Billing | null>(null);
 
   const [upiTxn, setUpiTxn] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -52,7 +54,24 @@ function BookingPage() {
       setContactEmail(data.user?.email ?? "");
       setContactName((data.user?.user_metadata as any)?.display_name ?? "");
     });
+    // Prefill from checkout if user came through /checkout
+    try {
+      const raw = sessionStorage.getItem("anout_checkout");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.event === id && Date.now() - parsed.ts < 60 * 60 * 1000) {
+          const b: Billing = parsed.billing;
+          setBilling(b);
+          setContactName(b.name);
+          setContactEmail(b.email);
+          setContactPhone(b.phone);
+          setCity(b.city);
+          setTerms(true);
+        }
+      }
+    } catch {}
   }, [id]);
+
 
   if (!exp) {
     return (
