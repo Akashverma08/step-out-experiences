@@ -1,15 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, Clock, CheckCircle2, XCircle, Ticket, Download, ChevronDown } from "lucide-react";
+import { Calendar, MapPin, Clock, CheckCircle2, XCircle, Ticket, Download, ChevronDown, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { generateTicketPDF } from "@/lib/ticket-pdf";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/my-bookings")({
   component: MyBookingsPage,
 });
+
 
 function MyBookingsPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -72,10 +75,28 @@ function MyBookingsPage() {
                       <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />{b.experiences.location}, {b.experiences.city}</div>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border/60 pt-3 text-xs text-foreground/70">
-                      <span>Booking #{b.id.slice(0, 8).toUpperCase()}</span>
+                      <span className="font-semibold text-ink">#{b.booking_number ?? b.id.slice(0, 8).toUpperCase()}</span>
                       <span>{b.seats} seat{b.seats > 1 ? "s" : ""}</span>
                       <span className="font-semibold text-ink">₹{b.amount_inr.toLocaleString("en-IN")}</span>
                       {b.upi_txn_id && <span>UPI #{b.upi_txn_id}</span>}
+                      {b.status === "approved" && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await generateTicketPDF({
+                                bookingNumber: b.booking_number ?? b.id.slice(0, 8).toUpperCase(),
+                                bookingId: b.id, title: b.experiences.title, category: CATEGORIES.find((c) => c.slug === b.experiences.category)?.label,
+                                dateISO: b.experiences.date, location: b.experiences.location, city: b.experiences.city,
+                                seats: b.seats, amount: b.amount_inr, attendee: b.contact_name,
+                                email: b.contact_email, phone: b.contact_phone, host: b.experiences.host_name, slug: b.experiences.slug,
+                              });
+                            } catch (e: any) { toast.error("Could not generate ticket"); }
+                          }}
+                          className="ml-auto inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold text-cream hover:opacity-90"
+                        >
+                          <FileText className="h-3 w-3" /> Download PDF ticket
+                        </button>
+                      )}
                     </div>
                     {b.admin_note && (
                       <div className="mt-3 rounded-2xl bg-rose-soft/40 p-3 text-xs text-foreground/80">
