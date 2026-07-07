@@ -55,7 +55,7 @@ function AdminPage() {
 function BookingsAdmin() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected" | "refunded" | "failed">("pending");
 
   async function load() {
     setLoading(true);
@@ -81,11 +81,12 @@ function BookingsAdmin() {
   }
 
   const filtered = filter === "all" ? items : items.filter((i) => i.status === filter);
+  const statuses = ["pending", "approved", "rejected", "refunded", "failed", "all"] as const;
 
   return (
     <div>
       <div className="mb-5 flex flex-wrap gap-2">
-        {(["pending", "approved", "rejected", "all"] as const).map((s) => (
+        {statuses.map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
@@ -107,14 +108,27 @@ function BookingsAdmin() {
            >
              <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt="" className="h-32 w-full rounded-2xl object-cover" />
              <div>
-               <h3 className="text-display text-lg font-semibold text-ink">{b.experiences.title}</h3>
+               <div className="flex flex-wrap items-center gap-2">
+                 <h3 className="text-display text-lg font-semibold text-ink">{b.experiences.title}</h3>
+                 <span className="rounded-full bg-rose-soft/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">#{b.booking_number ?? b.id.slice(0, 8)}</span>
+                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${b.payment_method === "razorpay" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"}`}>
+                   {b.payment_method === "razorpay" ? "Razorpay" : "UPI manual"}
+                 </span>
+               </div>
                <div className="mt-1 text-xs text-muted-foreground">{new Date(b.experiences.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} · {b.experiences.city}</div>
                <div className="mt-3 grid gap-1 text-xs text-foreground/80 sm:grid-cols-2">
-                 <div><b>{b.contact_name}</b></div>
+                 <div><b>{b.contact_name}</b> · Age {b.age} · {b.gender}</div>
                  <div>{b.contact_email}</div>
                  <div>{b.contact_phone}</div>
                  <div>{b.seats} seat(s) · ₹{b.amount_inr.toLocaleString("en-IN")}</div>
-                 {b.upi_txn_id && <div className="sm:col-span-2">UPI Txn: {b.upi_txn_id}</div>}
+                 {b.city && <div>City: {b.city}</div>}
+                 {b.emergency_contact && <div>Emergency: {b.emergency_contact}</div>}
+                 {b.upi_txn_id && <div className="sm:col-span-2">UPI Txn: <span className="font-mono">{b.upi_txn_id}</span></div>}
+                 {b.razorpay_payment_id && <div className="sm:col-span-2">Payment ID: <span className="font-mono">{b.razorpay_payment_id}</span></div>}
+                 {b.razorpay_order_id && <div className="sm:col-span-2">Order ID: <span className="font-mono text-[10px]">{b.razorpay_order_id}</span></div>}
+                 {b.paid_at && <div className="sm:col-span-2 text-green-700">Paid at: {new Date(b.paid_at).toLocaleString("en-IN")}</div>}
+                 {b.refund_id && <div className="sm:col-span-2 text-orange-700">Refund: {b.refund_id}</div>}
+                 {b.special_requests && <div className="sm:col-span-2 italic">Note: {b.special_requests}</div>}
                </div>
              </div>
              <div className="flex flex-col gap-2">
@@ -134,7 +148,7 @@ function BookingsAdmin() {
                  </>
                )}
                {b.status !== "pending" && (
-                 <span className={`rounded-full px-3 py-1.5 text-center text-xs font-semibold ${b.status === "approved" ? "bg-green-100 text-green-800" : "bg-destructive/15 text-destructive"}`}>
+                 <span className={`rounded-full px-3 py-1.5 text-center text-xs font-semibold capitalize ${b.status === "approved" ? "bg-green-100 text-green-800" : b.status === "refunded" ? "bg-orange-100 text-orange-800" : "bg-destructive/15 text-destructive"}`}>
                    {b.status}
                  </span>
                )}

@@ -19,12 +19,25 @@ function MyBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState<string | null>(null);
 
-  useEffect(() => {
-    supabase
+  async function reload() {
+    const { data } = await supabase
       .from("bookings")
       .select("*, experiences(*)")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => { setItems(data ?? []); setLoading(false); });
+      .order("created_at", { ascending: false });
+    setItems(data ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    reload();
+    // Live status updates via Realtime
+    const ch = supabase
+      .channel("my-bookings")
+      .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
+        reload();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
   return (

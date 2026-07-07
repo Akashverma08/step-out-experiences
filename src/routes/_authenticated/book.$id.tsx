@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Upload, Check, ArrowLeft, Copy } from "lucide-react";
+import { Calendar, MapPin, Upload, Check, ArrowLeft, Copy, CreditCard, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
 import { computeTotals, COUPONS } from "@/lib/cart";
+import { createRazorpayOrder, verifyRazorpayPayment } from "@/lib/razorpay.functions";
+import { openRazorpay } from "@/lib/razorpay-client";
 import { toast } from "sonner";
 
 type BookSearch = { seats?: number; coupon?: string };
@@ -27,6 +30,8 @@ function BookingPage() {
   const { id } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const rzpCreate = useServerFn(createRazorpayOrder);
+  const rzpVerify = useServerFn(verifyRazorpayPayment);
   const [exp, setExp] = useState<any>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
@@ -107,6 +112,81 @@ function BookingPage() {
     setStep(2);
   }
 
+  async function payWithRazorpay() {
+    const err = validateStep1();
+    if (err) { toast.error(err); setStep(1); return; }
+    setBusy(true);
+    try {
+      const order = await rzpCreate({
+        data: {
+          experienceId: exp.id,
+          seats,
+          couponCode: search.coupon ?? null,
+          terms_accepted: terms,
+          billing: {
+            name: contactName,
+            email: contactEmail,
+            phone: contactPhone,
+            address: billing?.address,
+            city: billing?.city ?? city,
+            state: billing?.state,
+            pincode: billing?.pincode,
+          },
+          attendee: {
+            age: parseInt(age, 10),
+            date_of_birth: dob,
+            gender,
+            emergency_contact: emergency || undefined,
+            special_requests: special || undefined,
+          },
+        },
+      });
+
+      await openRazorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.orderId,
+        name: "AN Out & About",
+        description: exp.title,
+        prefill: { name: contactName, email: contactEmail, contact: contactPhone },
+        notes: { booking_id: order.bookingId, experience: exp.slug },
+        theme: { color: "#e11d48" },
+        modal: {
+          ondismiss: () => {
+            setBusy(false);
+            toast("Payment cancelled. You can retry any time.");
+          },
+        },
+        handler: async (resp) => {
+          try {
+            await rzpVerify({
+              data: {
+                bookingId: order.bookingId,
+                razorpay_order_id: resp.razorpay_order_id,
+                razorpay_payment_id: resp.razorpay_payment_id,
+                razorpay_signature: resp.razorpay_signature,
+              },
+            });
+            try {
+              await (supabase as any).from("cart_items").delete().eq("experience_id", exp.id);
+              window.dispatchEvent(new CustomEvent("cart:changed"));
+              sessionStorage.removeItem("anout_checkout");
+            } catch {}
+            toast.success("Payment successful! Your ticket is ready.");
+            navigate({ to: "/booking-success/$id", params: { id: order.bookingId } });
+          } catch (e: any) {
+            toast.error(e.message ?? "Payment verification failed");
+            setBusy(false);
+          }
+        },
+      });
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not start payment");
+      setBusy(false);
+    }
+  }
+
   async function submitBooking() {
     if (!file) { toast.error("Please upload your payment screenshot"); return; }
     setBusy(true);
@@ -135,6 +215,7 @@ function BookingPage() {
         emergency_contact: emergency || null,
         special_requests: special || null,
         terms_accepted: terms,
+        payment_method: "upi_manual",
         gst_inr: totals.gst,
         platform_fee_inr: totals.platformFee,
         discount_inr: totals.discount,
@@ -229,16 +310,40 @@ function BookingPage() {
 
             {step === 2 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-                <h2 className="text-display text-2xl font-semibold text-ink">Pay ₹{total.toLocaleString("en-IN")} via UPI</h2>
-                <p className="text-sm text-muted-foreground">Open any UPI app (GPay, PhonePe, Paytm) and pay to the UPI ID below, or scan the QR.</p>
+                <h2 className="text-display text-2xl font-semibold text-ink">Choose how to pay ₹{total.toLocaleString("en-IN")}</h2>
 
-                <div className="rounded-2xl bg-rose-soft/30 p-5">
+                <div className="rounded-2xl border-2 border-primary/40 bg-rose-soft/20 p-5">
+                  <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
+                    Recommended · Instant
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <div>
+                      <div className="text-display text-lg font-semibold text-ink">Pay with Razorpay</div>
+                      <div className="text-xs text-muted-foreground">UPI · Cards · Netbanking · Wallets. Ticket confirmed instantly.</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={payWithRazorpay}
+                    disabled={busy}
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-rose-gradient px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-luxe disabled:opacity-60"
+                  >
+                    {busy ? "Opening…" : `Pay ₹${total.toLocaleString("en-IN")} securely`}
+                  </button>
+                  <div className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+                    <ShieldCheck className="h-3 w-3" /> 256-bit SSL · PCI-DSS · Razorpay verified
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 py-1"><div className="h-px flex-1 bg-border" /><span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">or pay manually via UPI</span><div className="h-px flex-1 bg-border" /></div>
+
+                <div className="rounded-2xl bg-card p-5 shadow-card-soft">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">UPI ID</div>
                       <div className="text-display text-xl font-semibold text-ink">{UPI_ID}</div>
                     </div>
-                    <button onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success("UPI ID copied"); }} className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-xs font-semibold text-primary shadow-card-soft">
+                    <button onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success("UPI ID copied"); }} className="inline-flex items-center gap-2 rounded-full bg-rose-soft/40 px-4 py-2 text-xs font-semibold text-primary">
                       <Copy className="h-3.5 w-3.5" /> Copy
                     </button>
                   </div>
@@ -246,19 +351,18 @@ function BookingPage() {
                     <span>Amount</span>
                     <span className="text-display text-lg font-semibold">₹{total.toLocaleString("en-IN")}</span>
                   </div>
-                  <a href={upiLink} className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">
+                  <a href={upiLink} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-ink">
                     Open UPI app to pay
                   </a>
-                </div>
-
-                <div className="grid place-items-center rounded-2xl bg-white p-4">
-                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`} alt="UPI QR" className="h-44 w-44" />
-                  <div className="mt-2 text-xs text-muted-foreground">Scan with any UPI app</div>
+                  <div className="mt-3 grid place-items-center">
+                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`} alt="UPI QR" className="h-36 w-36 rounded-lg bg-white p-2" />
+                    <div className="mt-1 text-[11px] text-muted-foreground">Scan with any UPI app</div>
+                  </div>
                 </div>
 
                 <div className="flex gap-3">
                   <button onClick={() => setStep(1)} className="flex-1 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold">Back</button>
-                  <button onClick={() => setStep(3)} className="flex-1 rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">I've paid →</button>
+                  <button onClick={() => setStep(3)} className="flex-1 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-ink">Uploaded screenshot? Continue →</button>
                 </div>
               </motion.div>
             )}
