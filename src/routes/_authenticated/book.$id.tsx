@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Upload, Check, ArrowLeft, Copy } from "lucide-react";
+import { Calendar, MapPin, Upload, Check, ArrowLeft, Copy, CreditCard, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
 import { computeTotals, COUPONS } from "@/lib/cart";
+import { createRazorpayOrder, verifyRazorpayPayment } from "@/lib/razorpay.functions";
+import { openRazorpay } from "@/lib/razorpay-client";
 import { toast } from "sonner";
 
 type BookSearch = { seats?: number; coupon?: string };
