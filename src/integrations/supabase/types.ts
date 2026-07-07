@@ -36,8 +36,15 @@ export type Database = {
           gender: string | null
           gst_inr: number
           id: string
+          paid_at: string | null
+          payment_method: string | null
           payment_screenshot_url: string | null
           platform_fee_inr: number
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          refund_id: string | null
+          refunded_at: string | null
           seats: number
           special_requests: string | null
           status: Database["public"]["Enums"]["booking_status"]
@@ -67,8 +74,15 @@ export type Database = {
           gender?: string | null
           gst_inr?: number
           id?: string
+          paid_at?: string | null
+          payment_method?: string | null
           payment_screenshot_url?: string | null
           platform_fee_inr?: number
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          refund_id?: string | null
+          refunded_at?: string | null
           seats?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -98,8 +112,15 @@ export type Database = {
           gender?: string | null
           gst_inr?: number
           id?: string
+          paid_at?: string | null
+          payment_method?: string | null
           payment_screenshot_url?: string | null
           platform_fee_inr?: number
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          refund_id?: string | null
+          refunded_at?: string | null
           seats?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -344,7 +365,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      booking_status: "pending" | "approved" | "rejected"
+      booking_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "refunded"
+        | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -473,7 +499,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      booking_status: ["pending", "approved", "rejected"],
+      booking_status: ["pending", "approved", "rejected", "refunded", "failed"],
     },
   },
 } as const
