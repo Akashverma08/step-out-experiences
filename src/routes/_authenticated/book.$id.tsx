@@ -30,6 +30,8 @@ function BookingPage() {
   const { id } = Route.useParams();
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const rzpCreate = useServerFn(createRazorpayOrder);
+  const rzpVerify = useServerFn(verifyRazorpayPayment);
   const [exp, setExp] = useState<any>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
