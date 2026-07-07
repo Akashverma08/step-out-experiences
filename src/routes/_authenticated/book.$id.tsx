@@ -112,6 +112,81 @@ function BookingPage() {
     setStep(2);
   }
 
+  async function payWithRazorpay() {
+    const err = validateStep1();
+    if (err) { toast.error(err); setStep(1); return; }
+    setBusy(true);
+    try {
+      const order = await rzpCreate({
+        data: {
+          experienceId: exp.id,
+          seats,
+          couponCode: search.coupon ?? null,
+          terms_accepted: terms,
+          billing: {
+            name: contactName,
+            email: contactEmail,
+            phone: contactPhone,
+            address: billing?.address,
+            city: billing?.city ?? city,
+            state: billing?.state,
+            pincode: billing?.pincode,
+          },
+          attendee: {
+            age: parseInt(age, 10),
+            date_of_birth: dob,
+            gender,
+            emergency_contact: emergency || undefined,
+            special_requests: special || undefined,
+          },
+        },
+      });
+
+      await openRazorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.orderId,
+        name: "AN Out & About",
+        description: exp.title,
+        prefill: { name: contactName, email: contactEmail, contact: contactPhone },
+        notes: { booking_id: order.bookingId, experience: exp.slug },
+        theme: { color: "#e11d48" },
+        modal: {
+          ondismiss: () => {
+            setBusy(false);
+            toast("Payment cancelled. You can retry any time.");
+          },
+        },
+        handler: async (resp) => {
+          try {
+            await rzpVerify({
+              data: {
+                bookingId: order.bookingId,
+                razorpay_order_id: resp.razorpay_order_id,
+                razorpay_payment_id: resp.razorpay_payment_id,
+                razorpay_signature: resp.razorpay_signature,
+              },
+            });
+            try {
+              await (supabase as any).from("cart_items").delete().eq("experience_id", exp.id);
+              window.dispatchEvent(new CustomEvent("cart:changed"));
+              sessionStorage.removeItem("anout_checkout");
+            } catch {}
+            toast.success("Payment successful! Your ticket is ready.");
+            navigate({ to: "/booking-success/$id", params: { id: order.bookingId } });
+          } catch (e: any) {
+            toast.error(e.message ?? "Payment verification failed");
+            setBusy(false);
+          }
+        },
+      });
+    } catch (e: any) {
+      toast.error(e.message ?? "Could not start payment");
+      setBusy(false);
+    }
+  }
+
   async function submitBooking() {
     if (!file) { toast.error("Please upload your payment screenshot"); return; }
     setBusy(true);
@@ -140,6 +215,7 @@ function BookingPage() {
         emergency_contact: emergency || null,
         special_requests: special || null,
         terms_accepted: terms,
+        payment_method: "upi_manual",
         gst_inr: totals.gst,
         platform_fee_inr: totals.platformFee,
         discount_inr: totals.discount,
