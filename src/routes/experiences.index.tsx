@@ -7,7 +7,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
 
-export const Route = createFileRoute("/experiences")({
+export const Route = createFileRoute("/experiences/")({
   head: () => ({
     meta: [
       { title: "All Experiences — AN Out & About" },
