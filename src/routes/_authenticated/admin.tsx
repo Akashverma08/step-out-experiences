@@ -104,10 +104,10 @@ function BookingsAdmin() {
            <motion.div
              key={b.id}
              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.04 }}
-             className="grid grid-cols-1 gap-5 rounded-3xl bg-card p-5 shadow-card-soft md:grid-cols-[140px_1fr_auto]"
+             className="grid grid-cols-1 gap-5 rounded-3xl bg-card p-5 shadow-card-soft md:grid-cols-[140px_minmax(0,1fr)_auto]"
            >
-             <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt="" className="h-32 w-full rounded-2xl object-cover" />
-             <div>
+             <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt="" className="h-40 w-full rounded-2xl object-cover md:h-32" />
+             <div className="min-w-0">
                <div className="flex flex-wrap items-center gap-2">
                  <h3 className="text-display text-lg font-semibold text-ink">{b.experiences.title}</h3>
                  <span className="rounded-full bg-rose-soft/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">#{b.booking_number ?? b.id.slice(0, 8)}</span>
