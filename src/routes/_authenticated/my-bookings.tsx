@@ -119,7 +119,7 @@ function MyBookingsPage() {
                   </div>
 
                   {b.status === "approved" ? (
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-rose-soft/30 p-3">
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-rose-soft/30 p-3 sm:col-span-2 lg:col-span-1">
                       <img alt="QR ticket" className="h-32 w-32 rounded-xl bg-white p-1" src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(JSON.stringify({ id: b.id, exp: b.experiences.slug, seats: b.seats, name: b.contact_name }))}`} />
                       <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">Your QR ticket</div>
                       <a
