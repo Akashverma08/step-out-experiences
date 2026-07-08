@@ -104,10 +104,10 @@ function BookingsAdmin() {
            <motion.div
              key={b.id}
              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.04 }}
-             className="grid grid-cols-1 gap-5 rounded-3xl bg-card p-5 shadow-card-soft md:grid-cols-[140px_1fr_auto]"
+             className="grid grid-cols-1 gap-5 rounded-3xl bg-card p-5 shadow-card-soft md:grid-cols-[140px_minmax(0,1fr)_auto]"
            >
-             <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt="" className="h-32 w-full rounded-2xl object-cover" />
-             <div>
+             <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt="" className="h-40 w-full rounded-2xl object-cover md:h-32" />
+             <div className="min-w-0">
                <div className="flex flex-wrap items-center gap-2">
                  <h3 className="text-display text-lg font-semibold text-ink">{b.experiences.title}</h3>
                  <span className="rounded-full bg-rose-soft/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">#{b.booking_number ?? b.id.slice(0, 8)}</span>
@@ -186,13 +186,13 @@ function ExperiencesAdmin() {
 
       <div className="grid gap-3">
         {items.map((e) => (
-          <div key={e.id} className="grid grid-cols-[80px_1fr_auto] items-center gap-4 rounded-2xl bg-card p-3 shadow-card-soft">
-            <img src={imageForExperience(e.image_url, e.category)} alt="" className="h-16 w-20 rounded-xl object-cover" />
-            <div>
-              <div className="text-display font-semibold text-ink">{e.title}</div>
-              <div className="text-xs text-muted-foreground">{e.city} · ₹{e.price_inr} · {new Date(e.date).toLocaleDateString("en-IN")} · {e.is_published ? "Published" : "Draft"}</div>
+          <div key={e.id} className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-card p-3 shadow-card-soft sm:grid-cols-[80px_1fr_auto] sm:gap-4">
+            <img src={imageForExperience(e.image_url, e.category)} alt="" className="h-16 w-16 rounded-xl object-cover sm:w-20" />
+            <div className="min-w-0">
+              <div className="text-display truncate font-semibold text-ink">{e.title}</div>
+              <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{e.city} · ₹{e.price_inr} · {new Date(e.date).toLocaleDateString("en-IN")} · {e.is_published ? "Published" : "Draft"}</div>
             </div>
-            <button onClick={() => remove(e.id)} className="grid h-9 w-9 place-items-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+            <button aria-label="Delete experience" onClick={() => remove(e.id)} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
