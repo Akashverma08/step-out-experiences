@@ -131,7 +131,7 @@ function MyBookingsPage() {
                       </a>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-rose-soft/20 p-3 text-center text-xs text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-rose-soft/20 p-3 text-center text-xs text-muted-foreground sm:col-span-2 lg:col-span-1">
                       <Ticket className="h-6 w-6 text-primary/60" />
                       <span>QR ticket unlocks after approval</span>
                     </div>
