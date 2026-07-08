@@ -75,6 +75,11 @@ export function Featured() {
           ))}
         </div>
       </div>
+      <div className="mt-8 text-center sm:hidden">
+        <Link to="/experiences" className="inline-flex items-center gap-2 rounded-full bg-rose-gradient px-6 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">
+          View All Experiences <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 }
