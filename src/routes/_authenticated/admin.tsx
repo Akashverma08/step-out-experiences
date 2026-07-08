@@ -186,13 +186,13 @@ function ExperiencesAdmin() {
 
       <div className="grid gap-3">
         {items.map((e) => (
-          <div key={e.id} className="grid grid-cols-[80px_1fr_auto] items-center gap-4 rounded-2xl bg-card p-3 shadow-card-soft">
-            <img src={imageForExperience(e.image_url, e.category)} alt="" className="h-16 w-20 rounded-xl object-cover" />
-            <div>
-              <div className="text-display font-semibold text-ink">{e.title}</div>
-              <div className="text-xs text-muted-foreground">{e.city} · ₹{e.price_inr} · {new Date(e.date).toLocaleDateString("en-IN")} · {e.is_published ? "Published" : "Draft"}</div>
+          <div key={e.id} className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-card p-3 shadow-card-soft sm:grid-cols-[80px_1fr_auto] sm:gap-4">
+            <img src={imageForExperience(e.image_url, e.category)} alt="" className="h-16 w-16 rounded-xl object-cover sm:w-20" />
+            <div className="min-w-0">
+              <div className="text-display truncate font-semibold text-ink">{e.title}</div>
+              <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{e.city} · ₹{e.price_inr} · {new Date(e.date).toLocaleDateString("en-IN")} · {e.is_published ? "Published" : "Draft"}</div>
             </div>
-            <button onClick={() => remove(e.id)} className="grid h-9 w-9 place-items-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
+            <button aria-label="Delete experience" onClick={() => remove(e.id)} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
