@@ -73,8 +73,8 @@ function MyBookingsPage() {
                 transition={{ duration: 0.4, delay: i * 0.06 }}
                 className="overflow-hidden rounded-3xl bg-card shadow-card-soft"
               >
-                <div className="grid gap-4 p-4 sm:grid-cols-[160px_1fr] sm:p-5 lg:grid-cols-[160px_1fr_180px]">
-                  <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt={b.experiences.title} className="h-32 w-full rounded-2xl object-cover sm:h-full" />
+                <div className="grid gap-4 p-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:p-5 lg:grid-cols-[160px_minmax(0,1fr)_200px]">
+                  <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt={b.experiences.title} className="h-40 w-full rounded-2xl object-cover sm:h-full" loading="lazy" />
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
