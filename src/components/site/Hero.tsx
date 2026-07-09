@@ -52,7 +52,7 @@ export function Hero() {
           <div className="flex items-center gap-2 text-script text-2xl text-primary">
             Step Out. Experience More. <Heart className="h-5 w-5 fill-primary text-primary" />
           </div>
-          <h1 className="mt-4 text-display font-semibold leading-[1.05] text-ink" style={{ fontSize: "clamp(2rem, 8vw, 4.5rem)" }}>
+          <h1 className="mt-4 text-display text-4xl leading-[1.05] font-semibold text-ink sm:text-6xl lg:text-7xl">
             Life Gets Better
             <br />
             <span className="text-primary italic">When You Step Out.</span>

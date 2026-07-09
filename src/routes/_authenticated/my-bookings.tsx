@@ -73,8 +73,8 @@ function MyBookingsPage() {
                 transition={{ duration: 0.4, delay: i * 0.06 }}
                 className="overflow-hidden rounded-3xl bg-card shadow-card-soft"
               >
-                <div className="grid gap-4 p-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:p-5 lg:grid-cols-[160px_minmax(0,1fr)_200px]">
-                  <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt={b.experiences.title} className="h-40 w-full rounded-2xl object-cover sm:h-full" loading="lazy" />
+                <div className="grid gap-4 p-4 sm:grid-cols-[160px_1fr] sm:p-5 lg:grid-cols-[160px_1fr_180px]">
+                  <img src={imageForExperience(b.experiences.image_url, b.experiences.category)} alt={b.experiences.title} className="h-32 w-full rounded-2xl object-cover sm:h-full" />
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
@@ -119,7 +119,7 @@ function MyBookingsPage() {
                   </div>
 
                   {b.status === "approved" ? (
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-rose-soft/30 p-3 sm:col-span-2 lg:col-span-1">
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-rose-soft/30 p-3">
                       <img alt="QR ticket" className="h-32 w-32 rounded-xl bg-white p-1" src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(JSON.stringify({ id: b.id, exp: b.experiences.slug, seats: b.seats, name: b.contact_name }))}`} />
                       <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">Your QR ticket</div>
                       <a
@@ -131,7 +131,7 @@ function MyBookingsPage() {
                       </a>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-rose-soft/20 p-3 text-center text-xs text-muted-foreground sm:col-span-2 lg:col-span-1">
+                    <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-rose-soft/20 p-3 text-center text-xs text-muted-foreground">
                       <Ticket className="h-6 w-6 text-primary/60" />
                       <span>QR ticket unlocks after approval</span>
                     </div>

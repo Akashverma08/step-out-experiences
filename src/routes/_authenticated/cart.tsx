@@ -80,35 +80,33 @@ function CartPage() {
             <div className="space-y-4">
               {rows.map((r, i) => (
                 <motion.div key={r.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                  className="grid gap-4 rounded-3xl bg-card p-4 shadow-card-soft sm:grid-cols-[140px_minmax(0,1fr)_auto] sm:p-5">
+                  className="grid gap-4 rounded-3xl bg-card p-4 shadow-card-soft sm:grid-cols-[140px_1fr_auto] sm:p-5">
                   <img src={imageForExperience(r.experiences?.image_url, r.experiences?.category)} alt={r.experiences?.title}
-                    className="h-40 w-full rounded-2xl object-cover sm:h-full" loading="lazy" />
+                    className="h-32 w-full rounded-2xl object-cover sm:h-full" />
                   <div className="min-w-0">
-                    <Link to="/experiences/$slug" params={{ slug: r.experiences?.slug }} className="text-display text-lg font-semibold text-ink hover:text-primary break-words">
+                    <Link to="/experiences/$slug" params={{ slug: r.experiences?.slug }} className="text-display text-lg font-semibold text-ink hover:text-primary">
                       {r.experiences?.title}
                     </Link>
                     <div className="mt-1.5 grid gap-1 text-xs text-foreground/80 sm:grid-cols-2">
-                      <div className="flex items-center gap-2 min-w-0"><Calendar className="h-3.5 w-3.5 shrink-0 text-primary" />
-                        <span className="truncate">{r.experiences?.date && new Date(r.experiences.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
+                      <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-primary" />
+                        {r.experiences?.date && new Date(r.experiences.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
                       </div>
-                      <div className="flex items-center gap-2 min-w-0"><MapPin className="h-3.5 w-3.5 shrink-0 text-primary" /><span className="truncate">{r.experiences?.location}, {r.experiences?.city}</span></div>
+                      <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />{r.experiences?.location}, {r.experiences?.city}</div>
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <button aria-label="Decrease quantity" onClick={() => change(r.id, r.quantity - 1)} className="grid h-11 w-11 place-items-center rounded-full bg-rose-soft/50 text-primary"><Minus className="h-3.5 w-3.5" /></button>
+                    <div className="mt-3 flex items-center gap-3">
+                      <button onClick={() => change(r.id, r.quantity - 1)} className="grid h-8 w-8 place-items-center rounded-full bg-rose-soft/50 text-primary"><Minus className="h-3.5 w-3.5" /></button>
                       <span className="text-display text-lg font-semibold">{r.quantity}</span>
-                      <button aria-label="Increase quantity" onClick={() => change(r.id, r.quantity + 1)} className="grid h-11 w-11 place-items-center rounded-full bg-rose-soft/50 text-primary"><Plus className="h-3.5 w-3.5" /></button>
-                      <button onClick={() => remove(r.id)} className="ml-auto inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10">
+                      <button onClick={() => change(r.id, r.quantity + 1)} className="grid h-8 w-8 place-items-center rounded-full bg-rose-soft/50 text-primary"><Plus className="h-3.5 w-3.5" /></button>
+                      <button onClick={() => remove(r.id)} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-destructive hover:underline">
                         <Trash2 className="h-3.5 w-3.5" /> Remove
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 sm:block sm:border-t-0 sm:pt-0 sm:text-right">
-                    <div>
-                      <div className="text-xs text-muted-foreground">Price</div>
-                      <div className="text-display text-xl font-semibold text-ink">₹{((r.experiences?.price_inr ?? 0) * r.quantity).toLocaleString("en-IN")}</div>
-                    </div>
+                  <div className="text-right">
+                    <div className="text-xs text-muted-foreground">Price</div>
+                    <div className="text-display text-xl font-semibold text-ink">₹{((r.experiences?.price_inr ?? 0) * r.quantity).toLocaleString("en-IN")}</div>
                     <button onClick={() => navigate({ to: "/checkout", search: { event: r.experience_id, seats: r.quantity } as any })}
-                      className="inline-flex items-center gap-1 rounded-full bg-rose-gradient px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-luxe sm:mt-3">
+                      className="mt-3 inline-flex items-center gap-1 rounded-full bg-rose-gradient px-4 py-2 text-xs font-semibold text-primary-foreground shadow-luxe">
                       Checkout <ArrowRight className="h-3.5 w-3.5" />
                     </button>
                   </div>

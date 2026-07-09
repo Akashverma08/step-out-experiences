@@ -10,9 +10,8 @@ const cols = [
 export function Footer() {
   return (
     <footer id="contact" className="bg-cream pt-16 pb-6">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.2fr_repeat(4,1fr)] lg:px-10">
-        <div className="sm:col-span-2 lg:col-span-1">
-
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.2fr_repeat(4,1fr)] lg:px-10">
+        <div>
           <Logo size={72} />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
             Creating meaningful experiences that bring people together, inspire creativity, and create stories worth remembering.
