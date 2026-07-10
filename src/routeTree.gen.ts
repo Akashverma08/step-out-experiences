@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ClaimAdminRouteImport } from './routes/claim-admin'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -25,6 +26,11 @@ import { Route as AuthenticatedBookingSuccessIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedBookIdRouteImport } from './routes/_authenticated/book.$id'
 import { Route as ApiPublicWebhooksRazorpayRouteImport } from './routes/api/public/webhooks/razorpay'
 
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/claim-admin': typeof ClaimAdminRoute
   '/contact': typeof ContactRoute
+  '/gallery': typeof GalleryRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/claim-admin': typeof ClaimAdminRoute
   '/contact': typeof ContactRoute
+  '/gallery': typeof GalleryRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/claim-admin': typeof ClaimAdminRoute
   '/contact': typeof ContactRoute
+  '/gallery': typeof GalleryRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/claim-admin'
     | '/contact'
+    | '/gallery'
     | '/admin'
     | '/cart'
     | '/checkout'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/claim-admin'
     | '/contact'
+    | '/gallery'
     | '/admin'
     | '/cart'
     | '/checkout'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/claim-admin'
     | '/contact'
+    | '/gallery'
     | '/_authenticated/admin'
     | '/_authenticated/cart'
     | '/_authenticated/checkout'
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ClaimAdminRoute: typeof ClaimAdminRoute
   ContactRoute: typeof ContactRoute
+  GalleryRoute: typeof GalleryRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ExperiencesSlugRoute: typeof ExperiencesSlugRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
@@ -218,6 +231,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -353,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ClaimAdminRoute: ClaimAdminRoute,
   ContactRoute: ContactRoute,
+  GalleryRoute: GalleryRoute,
   CategorySlugRoute: CategorySlugRoute,
   ExperiencesSlugRoute: ExperiencesSlugRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,
