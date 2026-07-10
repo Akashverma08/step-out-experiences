@@ -1,0 +1,1 @@
+GRANT SELECT ON public.experiences TO anon;
