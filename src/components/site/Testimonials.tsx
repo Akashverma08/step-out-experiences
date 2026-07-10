@@ -8,6 +8,7 @@ import g5 from "@/assets/gallery/g5-bookclub.jpg";
 import g6 from "@/assets/gallery/g6-music.jpg";
 import g7 from "@/assets/gallery/g7-picnic.jpg";
 import g8 from "@/assets/gallery/g8-yoga.jpg";
+import g9 from "@/assets/gallery/g9-brunch.jpg";
 
 type Testimonial = {
   handle: string;
