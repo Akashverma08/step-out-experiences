@@ -42,7 +42,7 @@ export function Navbar() {
 
         <nav className="hidden items-center gap-8 lg:flex">
           <Link to="/" className={link} activeProps={{ className: "text-primary" }}>Home</Link>
-          <Link to="/experiences" className={link} activeProps={{ className: "text-primary" }}>Experiences</Link>
+          <Link to="/gallery" className={link} activeProps={{ className: "text-primary" }}>Gallery</Link>
           <button
             onMouseEnter={() => setOpen(true)}
             onMouseLeave={() => setOpen(false)}
