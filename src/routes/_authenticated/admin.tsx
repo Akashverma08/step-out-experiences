@@ -1,11 +1,12 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Eye, Plus, Trash2, ShieldCheck, ArrowLeft } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Plus, Trash2, ShieldCheck, ArrowLeft, Upload, ImagePlus, X, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { uploadEventImage, deleteEventImage } from "@/lib/event-images";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
