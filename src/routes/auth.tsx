@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-
+import { lovable } from "@/integrations/lovable";
 import { Logo } from "@/components/site/Logo";
 import { toast } from "sonner";
 
