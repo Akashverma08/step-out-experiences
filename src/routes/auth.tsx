@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+
 import { Logo } from "@/components/site/Logo";
 import { toast } from "sonner";
 
@@ -58,18 +58,17 @@ function AuthPage() {
 
   async function handleGoogle() {
     setBusy(true);
-    const res = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth/callback`,
-      extraParams: { prompt: "select_account" },
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
-    if (res.error) {
-      toast.error(res.error.message ?? "Google sign-in failed");
+
+    if (error) {
+      toast.error(error.message);
       setBusy(false);
-      return;
-    }
-    if (!res.redirected) {
-      // Popup flow (editor preview) — session already set.
-      navigate({ to: "/experiences" });
     }
   }
 
@@ -78,7 +77,7 @@ function AuthPage() {
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Link to="/" className="inline-flex items-center gap-3">
-            <Logo size={56} />
+            <Logo size={106} />
           </Link>
           <h1 className="mt-8 text-display text-5xl font-semibold leading-tight text-ink sm:text-6xl">
             Step out, <span className="italic text-primary">show up.</span>
@@ -99,9 +98,8 @@ function AuthPage() {
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  mode === m ? "bg-rose-gradient text-primary-foreground shadow" : "text-foreground/70"
-                }`}
+                className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition ${mode === m ? "bg-rose-gradient text-primary-foreground shadow" : "text-foreground/70"
+                  }`}
               >
                 {m === "signin" ? "Sign In" : "Create Account"}
               </button>
@@ -113,7 +111,7 @@ function AuthPage() {
             disabled={busy}
             className="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-ink transition hover:bg-rose-soft/30 disabled:opacity-60"
           >
-            <svg className="h-5 w-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35.5 24 35.5c-6.4 0-11.5-5.1-11.5-11.5S17.6 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.2 29.2 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.2 29.2 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 43.5c5.2 0 9.8-1.7 13.4-4.6l-6.2-5.2c-2 1.4-4.5 2.3-7.2 2.3-5.2 0-9.6-3.1-11.3-7.4l-6.5 5C9.6 39.1 16.2 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2C40.4 36.1 43.5 30.5 43.5 24c0-1.2-.1-2.3.1-3.5z"/></svg>
+            <svg className="h-5 w-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35.5 24 35.5c-6.4 0-11.5-5.1-11.5-11.5S17.6 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.2 29.2 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z" /><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.2 29.2 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z" /><path fill="#4CAF50" d="M24 43.5c5.2 0 9.8-1.7 13.4-4.6l-6.2-5.2c-2 1.4-4.5 2.3-7.2 2.3-5.2 0-9.6-3.1-11.3-7.4l-6.5 5C9.6 39.1 16.2 43.5 24 43.5z" /><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2C40.4 36.1 43.5 30.5 43.5 24c0-1.2-.1-2.3.1-3.5z" /></svg>
             Continue with Google
           </button>
 

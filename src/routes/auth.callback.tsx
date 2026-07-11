@@ -49,7 +49,7 @@ function AuthCallback() {
   return (
     <div className="grid min-h-screen place-items-center bg-hero-gradient px-6 text-center">
       <div>
-        <Logo size={56} />
+        <Logo size={106} />
         <p className="mt-6 text-sm font-medium text-muted-foreground">Signing you in…</p>
       </div>
     </div>
