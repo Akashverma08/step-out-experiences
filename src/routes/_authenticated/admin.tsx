@@ -1,11 +1,12 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, Eye, Plus, Trash2, ShieldCheck, ArrowLeft } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Plus, Trash2, ShieldCheck, ArrowLeft, Upload, ImagePlus, X, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { CATEGORIES, imageForExperience } from "@/lib/categories";
+import { uploadEventImage, deleteEventImage } from "@/lib/event-images";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -186,17 +187,75 @@ function ExperiencesAdmin() {
 
       <div className="grid gap-3">
         {items.map((e) => (
-          <div key={e.id} className="grid grid-cols-[80px_1fr_auto] items-center gap-4 rounded-2xl bg-card p-3 shadow-card-soft">
-            <img src={imageForExperience(e.image_url, e.category)} alt="" className="h-16 w-20 rounded-xl object-cover" />
-            <div>
-              <div className="text-display font-semibold text-ink">{e.title}</div>
-              <div className="text-xs text-muted-foreground">{e.city} · ₹{e.price_inr} · {new Date(e.date).toLocaleDateString("en-IN")} · {e.is_published ? "Published" : "Draft"}</div>
-            </div>
-            <button onClick={() => remove(e.id)} className="grid h-9 w-9 place-items-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground">
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
+          <ExperienceRow key={e.id} exp={e} onChanged={load} onRemove={() => remove(e.id)} />
         ))}
+      </div>
+    </div>
+  );
+}
+
+function ExperienceRow({ exp, onChanged, onRemove }: { exp: any; onChanged: () => void; onRemove: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function onPick(file: File) {
+    setBusy(true);
+    try {
+      const { url } = await uploadEventImage(file);
+      // Delete old image (best-effort) then update row.
+      if (exp.image_url) await deleteEventImage(exp.image_url).catch(() => {});
+      const { error } = await supabase.from("experiences").update({ image_url: url }).eq("id", exp.id);
+      if (error) throw error;
+      toast.success("Image updated");
+      onChanged();
+    } catch (err: any) {
+      toast.error(err.message ?? "Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function clearImage() {
+    if (!exp.image_url) return;
+    if (!confirm("Remove this event's image? The placeholder will be shown instead.")) return;
+    setBusy(true);
+    try {
+      await deleteEventImage(exp.image_url).catch(() => {});
+      const { error } = await supabase.from("experiences").update({ image_url: null }).eq("id", exp.id);
+      if (error) throw error;
+      toast.success("Image removed");
+      onChanged();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="grid grid-cols-[80px_1fr_auto] items-center gap-4 rounded-2xl bg-card p-3 shadow-card-soft">
+      <img src={imageForExperience(exp.image_url, exp.category)} alt="" className="h-16 w-20 rounded-xl object-cover" />
+      <div>
+        <div className="text-display font-semibold text-ink">{exp.title}</div>
+        <div className="text-xs text-muted-foreground">{exp.city} · ₹{exp.price_inr} · {new Date(exp.date).toLocaleDateString("en-IN")} · {exp.is_published ? "Published" : "Draft"}</div>
+        <div className="mt-1 text-[10px] text-muted-foreground/70">{exp.image_url ? "Custom image" : "Using placeholder"}</div>
+      </div>
+      <div className="flex items-center gap-2">
+        <input ref={inputRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && onPick(e.target.files[0])} />
+        <button
+          onClick={() => inputRef.current?.click()}
+          disabled={busy}
+          className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-rose-soft/40 disabled:opacity-60"
+        >
+          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImagePlus className="h-3.5 w-3.5" />}
+          {exp.image_url ? "Replace" : "Upload"}
+        </button>
+        {exp.image_url && (
+          <button onClick={clearImage} disabled={busy} className="grid h-9 w-9 place-items-center rounded-full bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label="Remove image">
+            <X className="h-4 w-4" />
+          </button>
+        )}
+        <button onClick={onRemove} className="grid h-9 w-9 place-items-center rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground" aria-label="Delete experience">
+          <Trash2 className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
@@ -208,6 +267,7 @@ function NewExperienceForm({ onCreated }: { onCreated: () => void }) {
     category: "art", date: "", location: "", city: "",
     price_inr: 999, capacity: 20, host_name: "",
   });
+  const [image, setImage] = useState<{ url: string; path: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -217,13 +277,32 @@ function NewExperienceForm({ onCreated }: { onCreated: () => void }) {
       ...f,
       date: new Date(f.date).toISOString(),
       slug: f.slug || f.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      image_url: image?.url ?? null,
     });
     setBusy(false);
-    if (error) toast.error(error.message); else { toast.success("Created"); onCreated(); }
+    if (error) {
+      toast.error(error.message);
+      // If insert failed after upload, clean up the orphan file.
+      if (image) await deleteEventImage(image.url).catch(() => {});
+    } else {
+      toast.success("Created");
+      onCreated();
+    }
   }
 
   return (
     <form onSubmit={submit} className="mb-6 grid gap-3 rounded-3xl bg-card p-5 shadow-card-soft md:grid-cols-2">
+      <div className="md:col-span-2">
+        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Event image</label>
+        <ImageDropzone
+          value={image?.url ?? null}
+          onUploaded={(res) => setImage(res)}
+          onClear={async () => {
+            if (image) await deleteEventImage(image.url).catch(() => {});
+            setImage(null);
+          }}
+        />
+      </div>
       <In label="Title" value={f.title} onChange={(v) => setF({ ...f, title: v })} required />
       <In label="Slug (auto if blank)" value={f.slug} onChange={(v) => setF({ ...f, slug: v })} />
       <In label="Subtitle" value={f.subtitle} onChange={(v) => setF({ ...f, subtitle: v })} />
@@ -247,6 +326,83 @@ function NewExperienceForm({ onCreated }: { onCreated: () => void }) {
         {busy ? "Creating…" : "Create experience"}
       </button>
     </form>
+  );
+}
+
+function ImageDropzone({
+  value,
+  onUploaded,
+  onClear,
+}: {
+  value: string | null;
+  onUploaded: (res: { url: string; path: string }) => void;
+  onClear: () => void;
+}) {
+  const [drag, setDrag] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(file: File) {
+    // Local preview immediately.
+    const localUrl = URL.createObjectURL(file);
+    setPreview(localUrl);
+    setBusy(true);
+    setProgress(5);
+    try {
+      const res = await uploadEventImage(file, setProgress);
+      onUploaded(res);
+      toast.success("Image uploaded");
+    } catch (err: any) {
+      toast.error(err.message ?? "Upload failed");
+      setPreview(null);
+    } finally {
+      setBusy(false);
+      setProgress(0);
+    }
+  }
+
+  const shown = preview ?? value;
+
+  return (
+    <div
+      onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+      onDragLeave={() => setDrag(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDrag(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleFile(file);
+      }}
+      className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition ${drag ? "border-primary bg-rose-soft/40" : "border-border bg-muted/30"}`}
+    >
+      <input ref={inputRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      {shown ? (
+        <div className="relative">
+          <img src={shown} alt="Preview" className="h-56 w-full object-cover" />
+          <div className="absolute inset-x-0 bottom-0 flex justify-between gap-2 bg-gradient-to-t from-black/60 to-transparent p-3">
+            <button type="button" onClick={() => inputRef.current?.click()} disabled={busy} className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-ink hover:bg-white disabled:opacity-60">
+              <ImagePlus className="h-3.5 w-3.5" /> Replace
+            </button>
+            <button type="button" onClick={() => { setPreview(null); onClear(); }} disabled={busy} className="inline-flex items-center gap-2 rounded-full bg-destructive/90 px-3 py-1.5 text-xs font-semibold text-destructive-foreground hover:bg-destructive disabled:opacity-60">
+              <X className="h-3.5 w-3.5" /> Remove
+            </button>
+          </div>
+          {busy && (
+            <div className="absolute inset-x-0 bottom-0 h-1 bg-black/20">
+              <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+            </div>
+          )}
+        </div>
+      ) : (
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={busy} className="flex h-56 w-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
+          {busy ? <Loader2 className="h-6 w-6 animate-spin text-primary" /> : <Upload className="h-6 w-6 text-primary" />}
+          <span className="font-semibold text-ink">{busy ? `Uploading… ${progress}%` : "Drop image here or click to upload"}</span>
+          <span className="text-xs">PNG, JPG, WEBP up to 8 MB</span>
+        </button>
+      )}
+    </div>
   );
 }
 
