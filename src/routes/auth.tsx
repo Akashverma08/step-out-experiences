@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+
 import { Logo } from "@/components/site/Logo";
 import { toast } from "sonner";
 
@@ -58,15 +58,18 @@ function AuthPage() {
 
   async function handleGoogle() {
     setBusy(true);
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (res.error) {
-      toast.error(res.error.message ?? "Google sign-in failed");
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: { prompt: "select_account" },
+      },
+    });
+    if (error) {
+      toast.error(error.message ?? "Google sign-in failed");
       setBusy(false);
-      return;
     }
-    if (!res.redirected) {
-      navigate({ to: "/experiences" });
-    }
+    // On success the browser is redirected to Google.
   }
 
   return (
