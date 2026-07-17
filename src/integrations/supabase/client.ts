@@ -33,7 +33,7 @@ function createSupabaseClient() {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  /*if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [
       ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
@@ -41,7 +41,22 @@ function createSupabaseClient() {
     const message = `Missing  environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
-  }
+  } */
+ console.log("import.meta.env =", import.meta.env);
+
+console.log("VITE_SUPABASE_URL =", import.meta.env.VITE_SUPABASE_URL);
+console.log(
+  "VITE_SUPABASE_PUBLISHABLE_KEY =",
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+);
+
+console.log("process.env =", process.env);
+console.log("SUPABASE_URL =", process.env.SUPABASE_URL);
+console.log(
+  "SUPABASE_PUBLISHABLE_KEY =",
+  process.env.SUPABASE_PUBLISHABLE_KEY
+);
+
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {

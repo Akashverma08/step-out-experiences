@@ -3,18 +3,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 // Public key id — safe to expose to browser
-/* export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async () => {
+export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async () => {
   const keyId = process.env.RAZORPAY_KEY_ID;
   if (!keyId) throw new Error("Razorpay not configured");
   return { keyId };
-}); */
-
-export const getRazorpayKeyId = createServerFn({ method: "GET" }).handler(async () => {
-  return {
-    keyId: process.env.RAZORPAY_KEY_ID,
-    secretExists: !!process.env.RAZORPAY_KEY_SECRET,
-    envKeys: Object.keys(process.env).filter(k => k.includes("RAZOR")),
-  };
 });
 
 type BillingInput = {
