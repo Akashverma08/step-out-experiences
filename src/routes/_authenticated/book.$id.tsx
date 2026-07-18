@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/book/$id")({
 const UPI_ID = "anoutandabout@upi";
 const UPI_NAME = "AN Out & About";
 
-type Billing = { name: string; email: string; phone: string; address: string; city: string; state: string; pincode: string };
+
 
 function BookingPage() {
   const { id } = Route.useParams();
@@ -38,44 +38,46 @@ function BookingPage() {
   const [seats, setSeats] = useState(search.seats ?? 1);
   const couponPct = search.coupon ? (COUPONS[search.coupon.toUpperCase()] ?? 0) : 0;
   const [contactName, setContactName] = useState("");
-  const [age, setAge] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
+
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
-  const [emergency, setEmergency] = useState("");
-  const [city, setCity] = useState("");
+
+
   const [special, setSpecial] = useState("");
   const [terms, setTerms] = useState(false);
-  const [billing, setBilling] = useState<Billing | null>(null);
+
 
   const [upiTxn, setUpiTxn] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.from("experiences").select("*").eq("id", id).maybeSingle().then(({ data }) => setExp(data));
+  // Load experience
+  supabase
+    .from("experiences")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle()
+    .then(({ data }) => setExp(data));
+
+  // If user came from Checkout, use those details
+  const saved = sessionStorage.getItem("anout_checkout");
+
+  if (saved) {
+    const checkout = JSON.parse(saved);
+
+    setContactName(checkout.billing.name);
+    setContactEmail(checkout.billing.email);
+    setContactPhone(checkout.billing.phone);
+    setSeats(checkout.seats);
+  } else {
+    // Otherwise use logged-in user info
     supabase.auth.getUser().then(({ data }) => {
       setContactEmail(data.user?.email ?? "");
       setContactName((data.user?.user_metadata as any)?.display_name ?? "");
     });
-    // Prefill from checkout if user came through /checkout
-    try {
-      const raw = sessionStorage.getItem("anout_checkout");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed?.event === id && Date.now() - parsed.ts < 60 * 60 * 1000) {
-          const b: Billing = parsed.billing;
-          setBilling(b);
-          setContactName(b.name);
-          setContactEmail(b.email);
-          setContactPhone(b.phone);
-          setCity(b.city);
-          setTerms(true);
-        }
-      }
-    } catch {}
-  }, [id]);
+  }
+}, [id]);
 
 
   if (!exp) {
@@ -94,15 +96,17 @@ function BookingPage() {
   const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(exp.title)}`;
 
   function validateStep1(): string | null {
-    if (!contactName.trim() || contactName.trim().length < 2) return "Please enter your full name";
-    const ageNum = parseInt(age, 10);
-    if (!ageNum || ageNum < 5 || ageNum > 120) return "Please enter a valid age";
-    if (!dob) return "Please enter your date of birth";
-    if (!gender) return "Please select gender";
-    if (!/^[+0-9 \-]{7,15}$/.test(contactPhone)) return "Please enter a valid mobile number";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contactEmail)) return "Please enter a valid email";
-    if (!city.trim()) return "Please enter your city";
-    if (!terms) return "Please accept the terms & conditions";
+    if (!contactName.trim()) return "Please enter your name";
+
+    if (!/^[+0-9 \-]{7,15}$/.test(contactPhone))
+      return "Please enter a valid mobile number";
+
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contactEmail))
+      return "Please enter a valid email";
+
+    if (!terms)
+      return "Please accept the Terms & Conditions";
+
     return null;
   }
 
@@ -127,18 +131,12 @@ function BookingPage() {
             name: contactName,
             email: contactEmail,
             phone: contactPhone,
-            address: billing?.address,
-            city: billing?.city ?? city,
-            state: billing?.state,
-            pincode: billing?.pincode,
           },
           attendee: {
-            age: parseInt(age, 10),
-            date_of_birth: dob,
-            gender,
-            emergency_contact: emergency || undefined,
             special_requests: special || undefined,
           },
+
+
         },
       });
 
@@ -172,7 +170,7 @@ function BookingPage() {
               await (supabase as any).from("cart_items").delete().eq("experience_id", exp.id);
               window.dispatchEvent(new CustomEvent("cart:changed"));
               sessionStorage.removeItem("anout_checkout");
-            } catch {}
+            } catch { }
             toast.success("Payment successful! Your ticket is ready.");
             navigate({ to: "/booking-success/$id", params: { id: order.bookingId } });
           } catch (e: any) {
@@ -208,11 +206,6 @@ function BookingPage() {
         contact_name: contactName,
         contact_phone: contactPhone,
         contact_email: contactEmail,
-        age: parseInt(age, 10),
-        date_of_birth: dob,
-        gender,
-        city,
-        emergency_contact: emergency || null,
         special_requests: special || null,
         terms_accepted: terms,
         payment_method: "upi_manual",
@@ -221,12 +214,7 @@ function BookingPage() {
         discount_inr: totals.discount,
         coupon_code: search.coupon ?? null,
       };
-      if (billing) {
-        insertPayload.billing_address = billing.address;
-        insertPayload.billing_state = billing.state;
-        insertPayload.billing_pincode = billing.pincode;
-      }
-
+      
       const { data: inserted, error: insErr } = await (supabase as any).from("bookings").insert(insertPayload).select("id").maybeSingle();
       if (insErr) throw insErr;
 
@@ -235,7 +223,7 @@ function BookingPage() {
         await (supabase as any).from("cart_items").delete().eq("user_id", uid).eq("experience_id", exp.id);
         window.dispatchEvent(new CustomEvent("cart:changed"));
         sessionStorage.removeItem("anout_checkout");
-      } catch {}
+      } catch { }
 
       toast.success("Booking submitted! We'll verify and confirm within 12 hours.");
       navigate({ to: "/booking-success/$id", params: { id: inserted!.id } });
@@ -270,41 +258,41 @@ function BookingPage() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <h2 className="text-display text-2xl font-semibold text-ink">Your details</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Full name *"><input value={contactName} onChange={(e) => setContactName(e.target.value)} className="input" /></Field>
-                  <Field label="Age *"><input value={age} onChange={(e) => setAge(e.target.value)} type="number" min={5} max={120} className="input" /></Field>
-                  <Field label="Date of birth *"><input value={dob} onChange={(e) => setDob(e.target.value)} type="date" className="input" /></Field>
-                  <Field label="Gender *">
-                    <select value={gender} onChange={(e) => setGender(e.target.value)} className="input">
-                      <option value="">Select…</option>
-                      <option>Female</option><option>Male</option><option>Non-binary</option><option>Prefer not to say</option>
-                    </select>
-                  </Field>
-                  <Field label="Mobile number *"><input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="input" placeholder="+91 ..." /></Field>
-                  <Field label="Email *"><input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" className="input" /></Field>
-                  <Field label="Emergency contact (optional)"><input value={emergency} onChange={(e) => setEmergency(e.target.value)} className="input" placeholder="+91 ..." /></Field>
-                  <Field label="City *"><input value={city} onChange={(e) => setCity(e.target.value)} className="input" /></Field>
+                  
+
+                 
+
+                
                 </div>
 
-                <Field label="Number of tickets">
-                  <div className="flex items-center gap-3">
-                    <button type="button" onClick={() => setSeats(Math.max(1, seats - 1))} className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/50 text-primary">−</button>
-                    <span className="text-display text-xl font-semibold">{seats}</span>
-                    <button type="button" onClick={() => setSeats(Math.min(exp.capacity, seats + 1))} className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/50 text-primary">+</button>
-                  </div>
-                </Field>
+                
 
                 <Field label="Special requests (optional)">
                   <textarea value={special} onChange={(e) => setSpecial(e.target.value)} rows={3} className="input" placeholder="Dietary needs, accessibility, etc." />
                 </Field>
 
-                <label className="flex items-start gap-3 rounded-2xl bg-rose-soft/20 p-3 text-sm">
-                  <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
-                  <span>I accept the <a href="#" className="font-semibold text-primary">Terms & Conditions</a> and cancellation policy.</span>
-                </label>
+                <label className="flex items-start gap-3 rounded-2xl bg-rose-soft/20 p-4 text-sm">
+  <input
+    type="checkbox"
+    checked={terms}
+    onChange={(e) => setTerms(e.target.checked)}
+    className="mt-0.5 h-4 w-4 accent-primary"
+  />
 
-                <button onClick={goToPay} className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-rose-gradient px-5 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">
-                  Proceed to payment
-                </button>
+  <span>
+    I accept the Terms & Conditions and cancellation policy.
+  </span>
+</label>
+
+<button
+  onClick={goToPay}
+  className="w-full rounded-full bg-rose-gradient px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-luxe"
+>
+  Continue to Payment
+</button>
+
+                
+
               </motion.div>
             )}
 

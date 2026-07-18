@@ -31,10 +31,7 @@ function CheckoutPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [pincode, setPincode] = useState("");
+
 
   const [coupon, setCoupon] = useState(initialCoupon ?? "");
   const [couponPct, setCouponPct] = useState(initialCoupon ? (COUPONS[initialCoupon.toUpperCase()] ?? 0) : 0);
@@ -72,15 +69,12 @@ function CheckoutPage() {
     if (!name.trim() || name.trim().length < 2) return toast.error("Please enter your full name");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast.error("Please enter a valid email");
     if (!/^[+0-9 \-]{7,15}$/.test(phone)) return toast.error("Please enter a valid mobile");
-    if (!address.trim()) return toast.error("Please enter your billing address");
-    if (!city.trim()) return toast.error("Please enter your city");
-    if (!state) return toast.error("Please select your state");
-    if (!/^\d{6}$/.test(pincode)) return toast.error("Please enter a valid 6-digit pincode");
+
     if (!terms) return toast.error("Please accept the terms & conditions");
 
     sessionStorage.setItem("anout_checkout", JSON.stringify({
       event, seats, couponCode: couponPct ? coupon.toUpperCase() : null, couponPct,
-      totals, billing: { name, email, phone, address, city, state, pincode },
+      totals, billing: { name, email, phone},
       ts: Date.now(),
     }));
     navigate({ to: "/book/$id", params: { id: event }, search: { seats, coupon: couponPct ? coupon.toUpperCase() : undefined } as any });
@@ -104,15 +98,10 @@ function CheckoutPage() {
               <Field label="Full name *"><input value={name} onChange={(e) => setName(e.target.value)} className="input" /></Field>
               <Field label="Email *"><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="input" /></Field>
               <Field label="Mobile *"><input value={phone} onChange={(e) => setPhone(e.target.value)} className="input" placeholder="+91 ..." /></Field>
-              <Field label="Pincode *"><input value={pincode} onChange={(e) => setPincode(e.target.value)} maxLength={6} className="input" /></Field>
-              <div className="sm:col-span-2"><Field label="Billing address *"><input value={address} onChange={(e) => setAddress(e.target.value)} className="input" /></Field></div>
-              <Field label="City *"><input value={city} onChange={(e) => setCity(e.target.value)} className="input" /></Field>
-              <Field label="State *">
-                <select value={state} onChange={(e) => setState(e.target.value)} className="input">
-                  <option value="">Select…</option>
-                  {INDIAN_STATES.map((s) => <option key={s}>{s}</option>)}
-                </select>
-              </Field>
+              
+              <div className="sm:col-span-2"></div>
+
+             
             </div>
 
             <h2 className="mt-8 text-display text-lg font-semibold text-ink">Have a coupon?</h2>

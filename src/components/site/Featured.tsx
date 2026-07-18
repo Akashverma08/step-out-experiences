@@ -46,8 +46,7 @@ export function Featured() {
               transition={{ duration: 0.5, delay: i * 0.08 }}
             >
               <Link
-                to="/experiences/$slug"
-                params={{ slug: e.slug }}
+                to="/experiences"
                 className="group block overflow-hidden rounded-3xl bg-card shadow-card-soft transition hover:-translate-y-1 hover:shadow-luxe"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
@@ -59,15 +58,17 @@ export function Featured() {
                 <div className="p-5">
                   <h3 className="text-display text-xl font-semibold text-ink">{e.title}</h3>
                   <p className="mt-1 text-xs text-muted-foreground">{e.sub}</p>
-                  <div className="mt-4 space-y-1.5 text-xs text-foreground/80">
-                    <div className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5 text-primary" />{e.date}</div>
-                    <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />{e.loc}</div>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
-                    <span className="text-display text-xl font-semibold text-ink">{e.price}</span>
-                    <span className="grid h-9 w-9 place-items-center rounded-full bg-rose-soft/60 text-primary transition group-hover:bg-rose-gradient group-hover:text-primary-foreground">
-                      <Heart className="h-4 w-4" />
-                    </span>
+
+                  <div className="mt-6 border-t border-border/60 pt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-primary transition-colors group-hover:text-primary">
+                        Explore Experience
+                      </span>
+
+                      <span className="grid h-10 w-10 place-items-center rounded-full bg-rose-gradient text-white shadow-md transition-all duration-300 group-hover:scale-110">
+                        <ArrowRight className="h-5 w-5" />
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Link>
