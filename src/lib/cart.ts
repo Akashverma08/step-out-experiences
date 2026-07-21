@@ -88,12 +88,28 @@ export const GST_RATE = 0.05;
 export const PLATFORM_FEE = 49;
 export const COUPONS: Record<string, number> = { WELCOME10: 10, ANOUT15: 15, FIRST20: 20 };
 
-export function computeTotals(pricePerSeat: number, seats: number, couponPct = 0) {
+export function computeTotals(
+  pricePerSeat: number,
+  seats: number,
+  couponPct = 0
+) {
   const subtotal = pricePerSeat * seats;
+
   const discount = Math.round((subtotal * couponPct) / 100);
+
   const afterDiscount = subtotal - discount;
-  const gst = Math.round(afterDiscount * GST_RATE);
-  const platformFee = PLATFORM_FEE;
-  const total = afterDiscount + gst + platformFee;
-  return { subtotal, discount, gst, platformFee, total };
+
+  // GST and Platform Fee removed
+  const gst = 0;
+  const platformFee = 0;
+
+  const total = afterDiscount;
+
+  return {
+    subtotal,
+    discount,
+    gst,
+    platformFee,
+    total,
+  };
 }
