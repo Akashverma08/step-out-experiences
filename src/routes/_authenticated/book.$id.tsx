@@ -21,8 +21,8 @@ export const Route = createFileRoute("/_authenticated/book/$id")({
   }),
 });
 
-const UPI_ID = "anoutandabout@upi";
-const UPI_NAME = "AN Out & About";
+const UPI_ID = "7428832025@apl";
+const UPI_NAME = "Akash Verma";
 
 
 
@@ -52,32 +52,32 @@ function BookingPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-  // Load experience
-  supabase
-    .from("experiences")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle()
-    .then(({ data }) => setExp(data));
+    // Load experience
+    supabase
+      .from("experiences")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle()
+      .then(({ data }) => setExp(data));
 
-  // If user came from Checkout, use those details
-  const saved = sessionStorage.getItem("anout_checkout");
+    // If user came from Checkout, use those details
+    const saved = sessionStorage.getItem("anout_checkout");
 
-  if (saved) {
-    const checkout = JSON.parse(saved);
+    if (saved) {
+      const checkout = JSON.parse(saved);
 
-    setContactName(checkout.billing.name);
-    setContactEmail(checkout.billing.email);
-    setContactPhone(checkout.billing.phone);
-    setSeats(checkout.seats);
-  } else {
-    // Otherwise use logged-in user info
-    supabase.auth.getUser().then(({ data }) => {
-      setContactEmail(data.user?.email ?? "");
-      setContactName((data.user?.user_metadata as any)?.display_name ?? "");
-    });
-  }
-}, [id]);
+      setContactName(checkout.billing.name);
+      setContactEmail(checkout.billing.email);
+      setContactPhone(checkout.billing.phone);
+      setSeats(checkout.seats);
+    } else {
+      // Otherwise use logged-in user info
+      supabase.auth.getUser().then(({ data }) => {
+        setContactEmail(data.user?.email ?? "");
+        setContactName((data.user?.user_metadata as any)?.display_name ?? "");
+      });
+    }
+  }, [id]);
 
 
   if (!exp) {
@@ -214,7 +214,7 @@ function BookingPage() {
         discount_inr: totals.discount,
         coupon_code: search.coupon ?? null,
       };
-      
+
       const { data: inserted, error: insErr } = await (supabase as any).from("bookings").insert(insertPayload).select("id").maybeSingle();
       if (insErr) throw insErr;
 
@@ -258,40 +258,40 @@ function BookingPage() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <h2 className="text-display text-2xl font-semibold text-ink">Your details</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  
 
-                 
 
-                
+
+
+
                 </div>
 
-                
+
 
                 <Field label="Special requests (optional)">
                   <textarea value={special} onChange={(e) => setSpecial(e.target.value)} rows={3} className="input" placeholder="Dietary needs, accessibility, etc." />
                 </Field>
 
                 <label className="flex items-start gap-3 rounded-2xl bg-rose-soft/20 p-4 text-sm">
-  <input
-    type="checkbox"
-    checked={terms}
-    onChange={(e) => setTerms(e.target.checked)}
-    className="mt-0.5 h-4 w-4 accent-primary"
-  />
+                  <input
+                    type="checkbox"
+                    checked={terms}
+                    onChange={(e) => setTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                  />
 
-  <span>
-    I accept the Terms & Conditions and cancellation policy.
-  </span>
-</label>
+                  <span>
+                    I accept the Terms & Conditions and cancellation policy.
+                  </span>
+                </label>
 
-<button
-  onClick={goToPay}
-  className="w-full rounded-full bg-rose-gradient px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-luxe"
->
-  Continue to Payment
-</button>
+                <button
+                  onClick={goToPay}
+                  className="w-full rounded-full bg-rose-gradient px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-luxe"
+                >
+                  Continue to Payment
+                </button>
 
-                
+
 
               </motion.div>
             )}
@@ -339,9 +339,14 @@ function BookingPage() {
                     <span>Amount</span>
                     <span className="text-display text-lg font-semibold">₹{total.toLocaleString("en-IN")}</span>
                   </div>
-                  <a href={upiLink} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-ink">
+                  <button
+                    onClick={() => {
+                      window.location.href = upiLink;
+                    }}
+                    className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-ink"
+                  >
                     Open UPI app to pay
-                  </a>
+                  </button>
                   <div className="mt-3 grid place-items-center">
                     <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`} alt="UPI QR" className="h-36 w-36 rounded-lg bg-white p-2" />
                     <div className="mt-1 text-[11px] text-muted-foreground">Scan with any UPI app</div>

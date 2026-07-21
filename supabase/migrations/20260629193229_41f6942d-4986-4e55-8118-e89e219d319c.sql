@@ -59,7 +59,7 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
 DECLARE
-  admin_emails text[] := ARRAY['akashverma0401@gmail.com'];
+  admin_emails text[] := ARRAY['jainanshika1404@gmail.com'];
 BEGIN
   INSERT INTO public.profiles (id, display_name, avatar_url)
   VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'display_name', NEW.email), NEW.raw_user_meta_data->>'avatar_url')
@@ -78,5 +78,5 @@ $$;
 -- Retroactively grant admin if that email already signed up
 INSERT INTO public.user_roles (user_id, role)
 SELECT u.id, 'admin'::app_role FROM auth.users u
-WHERE u.email = 'akashverma0401@gmail.com'
+WHERE u.email = 'jainanshika1404@gmail.com'
 ON CONFLICT DO NOTHING;
