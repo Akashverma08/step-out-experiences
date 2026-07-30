@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@source "../src";
+/* Removed unknown at-rule `@source "../src";` which is not a standard CSS at-rule */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
