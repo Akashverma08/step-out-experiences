@@ -106,7 +106,13 @@ export function Hero() {
           className="relative mx-auto w-full max-w-md lg:max-w-none"
         >
           <div className="relative aspect-[5/6] overflow-hidden rounded-[2rem] shadow-luxe">
-            <img src={heroImg} alt="Friends gathering at a candle-lit experience" className="h-full w-full object-cover" />
+            <img
+              src={heroImg}
+              alt="Friends gathering at a candle-lit experience"
+              className="h-full w-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+            />
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/15 via-transparent to-transparent" />
           </div>
 
@@ -124,7 +130,7 @@ export function Hero() {
                 transition={{ delay: 0.3 + i * 0.1 }}
                 className="flex w-52 items-center gap-3 rounded-2xl glass-card p-2 shadow-card-soft"
               >
-                <img src={c.img} alt="" className="h-12 w-12 rounded-xl object-cover" loading="lazy" />
+                <img src={c.img} alt="" className="h-12 w-12 rounded-xl object-cover" loading="eager" />
                 <div className="min-w-0">
                   <div className="text-sm font-semibold leading-tight text-ink">
                     {c.title}<br />{c.sub}
