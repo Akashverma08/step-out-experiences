@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Heart } from "lucide-react";
-import heroImg from "@/assets/hero-friends.jpg";
+import heroImg from "@/public/hero-friends.jpg"
 import painting from "@/assets/exp-painting.jpg";
 import social from "@/assets/exp-social.jpg";
 import food from "@/assets/exp-food.jpg";
