@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
-import { SearchBar } from "@/components/site/SearchBar";
 import { Categories } from "@/components/site/Categories";
 import { Featured } from "@/components/site/Featured";
 import { StatsBand } from "@/components/site/StatsBand";
@@ -9,6 +8,7 @@ import { Movement } from "@/components/site/Movement";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Newsletter } from "@/components/site/Newsletter";
 import { Footer } from "@/components/site/Footer";
+import { Founders } from "@/components/site/Founders";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,11 +27,11 @@ function Home() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
-      <SearchBar />
       <Categories />
       <Featured />
       <StatsBand />
       <Movement />
+      <Founders/>
       <Testimonials />
       <Newsletter />
       <Footer />

@@ -1,14 +1,14 @@
 import { Star, Instagram, ArrowRight, Heart, MessageCircle, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import g1 from "@/assets/gallery/g1-cafe.jpg";
-import g2 from "@/assets/gallery/g2-pottery.jpg";
-import g3 from "@/assets/gallery/g3-painting.jpg";
-import g4 from "@/assets/gallery/g4-candles.jpg";
-import g5 from "@/assets/gallery/g5-bookclub.jpg";
-import g6 from "@/assets/gallery/g6-music.jpg";
-import g7 from "@/assets/gallery/g7-picnic.jpg";
-import g8 from "@/assets/gallery/g8-yoga.jpg";
-import g9 from "@/assets/gallery/g9-brunch.jpg";
+import g1 from "@/assets/gallery/1.jpg";
+import g2 from "@/assets/gallery/43.jpg";
+import g3 from "@/assets/gallery/12.jpg";
+import g4 from "@/assets/gallery/16.jpg";
+import g5 from "@/assets/gallery/30.jpg";
+import g6 from "@/assets/gallery/34.jpg";
+import g7 from "@/assets/gallery/9.jpg";
+import g8 from "@/assets/gallery/29.jpg";
+import g9 from "@/assets/gallery/38.jpg";
 
 type Testimonial = {
   handle: string;

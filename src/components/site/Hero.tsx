@@ -16,10 +16,10 @@ const sideCards = [
 ];
 
 const stats = [
-  { n: "200+", l: "Experiences Hosted" },
-  { n: "5000+", l: "Happy Explorers" },
-  { n: "25+", l: "Cities Covered" },
-  { n: "50+", l: "Community Partners" },
+  { n: "Curated", l: "Experiences" },
+  { n: "Verified", l: "Hosts" },
+  { n: "Easy", l: "Booking" },
+  { n: "Local", l: "Communities" },
 ];
 
 export function Hero() {
@@ -66,7 +66,7 @@ export function Hero() {
               Explore Experiences
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </Link>
-            <Link to="/experiences" className="inline-flex items-center gap-3 text-sm font-semibold text-ink">
+            <Link to="/gallery" className="inline-flex items-center gap-3 text-sm font-semibold text-ink">
               <span className="grid h-12 w-12 place-items-center rounded-full bg-rose-gradient text-primary-foreground shadow-luxe">
                 <Play className="h-4 w-4 fill-current" />
               </span>
@@ -74,12 +74,27 @@ export function Hero() {
             </Link>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <div className="mt-12 grid grid-cols-2 gap-5 sm:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.l}>
-                <div className="text-display text-3xl font-semibold text-ink">{s.n}</div>
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.l}</div>
-              </div>
+              <motion.div
+                key={s.l}
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.25 }}
+                className="group"
+              >
+                {/* Script Heading */}
+                <h3 className="text-script text-[2.1rem] leading-none text-primary">
+                  {s.n}
+                </h3>
+
+                {/* Divider */}
+                <div className="my-3 h-[2px] w-12 rounded-full bg-primary/30 transition-all duration-300 group-hover:w-20 group-hover:bg-primary" />
+
+                {/* Subtitle */}
+                <p className="text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+                  {s.l}
+                </p>
+              </motion.div>
             ))}
           </div>
         </motion.div>
@@ -100,7 +115,7 @@ export function Hero() {
           </div>
 
           {/* side cards only on xl to prevent overflow */}
-          <div className="absolute -right-2 top-4 hidden flex-col gap-3 xl:flex">
+          <div className="absolute -right-2 top-4 hidden lg:flex flex-col gap-3">
             {sideCards.map((c, i) => (
               <motion.div
                 key={c.title}

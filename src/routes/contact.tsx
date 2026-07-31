@@ -70,7 +70,7 @@ function ContactPage() {
         <div className="space-y-4">
           <InfoCard icon={<Mail className="h-4 w-4" />} title="Email" body="hello@anoutandabout.in" />
           <InfoCard icon={<Phone className="h-4 w-4" />} title="WhatsApp" body="+91 98765 43210" />
-          <InfoCard icon={<MapPin className="h-4 w-4" />} title="Studio" body="Bandra West, Mumbai" />
+          <InfoCard icon={<MapPin className="h-4 w-4" />} title="Office" body="Shahdara, East Delhi" />
           <div className="rounded-3xl bg-rose-soft/30 p-6 text-sm text-foreground/80">
             For booking-specific issues, please mention your <b>Booking ID</b> in the message. You can find it under "My Bookings".
           </div>

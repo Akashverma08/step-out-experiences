@@ -2,11 +2,11 @@ import band from "@/assets/band-community.jpg";
 import { Sparkles, Users, MapPin, Handshake, Calendar, Heart } from "lucide-react";
 
 const stats = [
-  { icon: Calendar, n: "200+", l: "Unique Experiences" },
-  { icon: Users, n: "5000+", l: "Happy Explorers" },
-  { icon: MapPin, n: "25+", l: "Cities Across India" },
-  { icon: Handshake, n: "50+", l: "Community Partners" },
-];
+  { icon: Calendar, n: "15+", l: "Curated Events" },
+  { icon: Users, n: "100+", l: "Community Members" },
+  { icon: MapPin, n: "4+", l: "Event Locations" },
+  { icon: Handshake, n: "8+", l: "Local Partners" },
+];  
 
 export function StatsBand() {
   return (

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { CheckCircle2, Play, Sparkles } from "lucide-react";
 import painting from "@/assets/exp-painting.jpg";
 import social from "@/assets/exp-social.jpg";
@@ -25,18 +26,22 @@ export function Movement() {
       </div>
 
       <div>
-        <div className="text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">About & Out</div>
+        <div className="text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">Out & About </div>
         <h2 className="mt-3 text-display text-4xl font-semibold text-ink sm:text-5xl">
           More Than Events,
           <br />
           <span className="italic text-primary">It's a Movement.</span>
         </h2>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-          We believe life is better when lived beyond four walls. About & Out curates experiences that inspire you to explore, create, connect and make memories that stay with you forever.
+          We believe life is better when lived beyond four walls. Out & About curates experiences that inspire you to explore, create, connect and make memories that stay with you forever.
         </p>
-        <button className="mt-6 inline-flex items-center gap-2 rounded-full bg-rose-gradient px-6 py-3 text-sm font-semibold text-primary-foreground shadow-luxe">
-          <Play className="h-4 w-4 fill-current" /> Know Our Story
-        </button>
+        <Link
+  to="/gallery"
+  className="mt-6 inline-flex items-center gap-2 rounded-full bg-rose-gradient px-6 py-3 text-sm font-semibold text-primary-foreground shadow-luxe transition hover:scale-105"
+>
+  <Play className="h-4 w-4 fill-current" />
+  Know Our Story
+</Link>
       </div>
 
       <ul className="space-y-5">
