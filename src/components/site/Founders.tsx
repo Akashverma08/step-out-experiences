@@ -179,35 +179,34 @@ export function Founders() {
                         {/* Bottom Content */}
 
                         <div className="grid grid-cols-1 gap-8 p-8 md:grid-cols-2 md:gap-12 md:p-10">
-
-                            {/* Left */}
+                            {/* Sora Events */}
 
                             <div className="flex h-full flex-col rounded-3xl bg-rose-50/60 p-7">
-
-                                <p className="text-xs uppercase tracking-[0.35em] text-primary font-semibold">
-                                    Event Organizer
+                                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary">
+                                    Community Partner
                                 </p>
 
                                 <h3 className="mt-3 text-3xl font-semibold text-ink">
-                                    Anshika Jain
+                                    Sora Events
                                 </h3>
 
                                 <p className="mt-5 flex-1 leading-8 text-muted-foreground">
-                                    Founder of Sora Events, passionate about designing immersive
-                                    workshops, social gatherings and memorable experiences that
-                                    bring people together through creativity and meaningful
-                                    connections.
+                                    Sora Events specializes in planning and organizing unforgettable events,
+                                    creative workshops, and unique social experiences. As our official event
+                                    partner, they help turn every gathering into a memorable experience that
+                                    people cherish long after it ends.
                                 </p>
 
                                 <div className="mt-6 flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm">
                                     <img
                                         src={soraLogo}
+                                        alt="Sora Events"
                                         className="h-12 w-12 rounded-xl object-cover"
                                     />
 
                                     <div>
                                         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                                            Founder of
+                                            Official Partner
                                         </p>
 
                                         <h4 className="font-semibold text-ink">
@@ -225,41 +224,39 @@ export function Founders() {
                                     <Instagram size={18} />
                                     @soraeventsofficial
                                 </a>
-
                             </div>
 
-                            {/* Right */}
+                            {/* SocialLnking */}
 
                             <div className="flex h-full flex-col rounded-3xl bg-rose-50/60 p-7">
-
-                                <p className="text-xs uppercase tracking-[0.35em] text-primary font-semibold">
-                                    Workshop Curator
+                                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary">
+                                    Community Partner
                                 </p>
 
                                 <h3 className="mt-3 text-3xl font-semibold text-ink">
-                                    Neha Chaudhary
+                                    SocialLnking
                                 </h3>
 
                                 <p className="mt-5 flex-1 leading-8 text-muted-foreground">
-                                    Passionate about building communities through engaging
-                                    workshops, collaborations and meaningful real-world
-                                    experiences that help people connect, learn and grow
-                                    together.
+                                    SocialLnking is our official community and social media partner, helping
+                                    connect people through creative content, digital marketing, and event
+                                    promotions. Together, we build stronger communities and bring every event
+                                    to a wider audience.
                                 </p>
-
                                 <div className="mt-6 flex items-center gap-4 rounded-2xl bg-white p-4 shadow-sm">
                                     <img
                                         src={sociallnking}
+                                        alt="SocialLnking"
                                         className="h-12 w-12 rounded-xl object-cover"
                                     />
 
                                     <div>
                                         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                                            Founder of
+                                            Official Partner
                                         </p>
 
                                         <h4 className="font-semibold text-ink">
-                                            Sociallnking
+                                            SocialLnking
                                         </h4>
                                     </div>
                                 </div>
@@ -271,11 +268,9 @@ export function Founders() {
                                     className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-6 py-3 text-white transition hover:scale-105"
                                 >
                                     <Instagram size={18} />
-                                    @nehachaudhary
+                                    @sociallnking
                                 </a>
-
                             </div>
-
                         </div>
 
                         <div className="border-t bg-rose-50 p-8 text-center">
