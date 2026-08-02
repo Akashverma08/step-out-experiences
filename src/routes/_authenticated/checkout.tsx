@@ -108,7 +108,7 @@ function CheckoutPage() {
             <div className="mt-2 flex items-center gap-2">
               <div className="relative flex-1">
                 <Tag className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-primary" />
-                <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="WELCOME10"
+                <input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="coupon code"
                   className="w-full rounded-full border border-border bg-background py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary" />
               </div>
               <button onClick={applyCoupon} className="rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-cream">Apply</button>
