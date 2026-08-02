@@ -150,29 +150,7 @@ export function Founders() {
                         transition={{ duration: 0.8 }}
                         className="overflow-hidden rounded-[2.5rem] bg-white shadow-[0_20px_70px_rgba(0,0,0,0.08)]"
                     >
-                        {/* Top Image */}
-
-                        <div className="p-5 md:p-8">
-                            <div className="relative mx-auto overflow-hidden rounded-[2rem] md:max-w-4xl lg:max-w-5xl">
-                                <img
-                                    src={founder1}
-                                    alt="Founders"
-                                    className="w-full rounded-[2rem] object-contain bg-[#f8f5f2] md:max-h-[520px] lg:max-h-[600px]"
-                                />
-
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-
-                                <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8">
-                                    <h3 className="text-3xl font-bold text-white md:text-5xl">
-                                        Meet Our Founders
-                                    </h3>
-
-                                    <p className="mt-2 text-sm text-white/90 md:text-lg">
-                                        Passionately building meaningful experiences.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        
 
                         {/* Bottom Content */}
 

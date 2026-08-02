@@ -79,17 +79,15 @@ function ExperiencesPage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <button
               onClick={() => setCat("all")}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                cat === "all" ? "bg-rose-gradient text-primary-foreground shadow" : "bg-card text-foreground/70"
-              }`}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${cat === "all" ? "bg-rose-gradient text-primary-foreground shadow" : "bg-card text-foreground/70"
+                }`}
             >All</button>
             {CATEGORIES.map((c) => (
               <button
                 key={c.slug}
                 onClick={() => setCat(c.slug)}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                  cat === c.slug ? "bg-rose-gradient text-primary-foreground shadow" : "bg-card text-foreground/70 hover:bg-rose-soft/50"
-                }`}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${cat === c.slug ? "bg-rose-gradient text-primary-foreground shadow" : "bg-card text-foreground/70 hover:bg-rose-soft/50"
+                  }`}
               >{c.label}</button>
             ))}
           </div>
@@ -123,15 +121,15 @@ function ExperiencesPage() {
                   className="group block overflow-hidden rounded-3xl bg-card shadow-card-soft transition hover:-translate-y-1 hover:shadow-luxe"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden rounded-t-3xl bg-white flex items-center justify-center">
-  <img
-    src={imageForExperience(e.image_url, e.category)}
-    alt={e.title}
-    className="max-h-full max-w-full object-contain transition duration-700 group-hover:scale-105"
-  />
-  <span className="absolute left-3 top-3 rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-luxe">
-    {CATEGORIES.find((c) => c.slug === e.category)?.label ?? e.category}
-  </span>
-</div>
+                    <img
+                      src={imageForExperience(e.image_url, e.category)}
+                      alt={e.title}
+                      className="max-h-full max-w-full object-contain transition duration-700 group-hover:scale-105"
+                    />
+                    <span className="absolute left-3 top-3 rounded-full bg-rose-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-luxe">
+                      {CATEGORIES.find((c) => c.slug === e.category)?.label ?? e.category}
+                    </span>
+                  </div>
                   <div className="p-5">
                     <h3 className="text-display text-xl font-semibold text-ink">{e.title}</h3>
                     {e.subtitle && <p className="mt-1 text-xs text-muted-foreground">{e.subtitle}</p>}
