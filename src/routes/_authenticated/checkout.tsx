@@ -117,7 +117,16 @@ function CheckoutPage() {
 
             <label className="mt-6 flex items-start gap-3 rounded-2xl bg-rose-soft/20 p-4 text-sm">
               <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" />
-              <span>I accept the <a href="#" className="font-semibold text-primary">Terms & Conditions</a>, cancellation policy, and confirm the details above are correct.</span>
+              <span>
+  I accept the{" "}
+  <Link
+    to="/term"
+    className="font-semibold text-primary hover:underline"
+  >
+    Terms & Conditions
+  </Link>{" "}
+  and confirm that the information provided above is accurate.
+</span>
             </label>
 
             <button onClick={proceed}

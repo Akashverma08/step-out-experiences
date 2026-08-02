@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermRouteImport } from './routes/term'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ClaimAdminRouteImport } from './routes/claim-admin'
@@ -27,6 +29,16 @@ import { Route as AuthenticatedBookingSuccessIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedBookIdRouteImport } from './routes/_authenticated/book.$id'
 import { Route as ApiPublicWebhooksRazorpayRouteImport } from './routes/api/public/webhooks/razorpay'
 
+const TermRoute = TermRouteImport.update({
+  id: '/term',
+  path: '/term',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -120,6 +132,8 @@ export interface FileRoutesByFullPath {
   '/claim-admin': typeof ClaimAdminRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/privacy': typeof PrivacyRoute
+  '/term': typeof TermRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -138,6 +152,8 @@ export interface FileRoutesByTo {
   '/claim-admin': typeof ClaimAdminRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/privacy': typeof PrivacyRoute
+  '/term': typeof TermRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
@@ -158,6 +174,8 @@ export interface FileRoutesById {
   '/claim-admin': typeof ClaimAdminRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/privacy': typeof PrivacyRoute
+  '/term': typeof TermRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
@@ -178,6 +196,8 @@ export interface FileRouteTypes {
     | '/claim-admin'
     | '/contact'
     | '/gallery'
+    | '/privacy'
+    | '/term'
     | '/admin'
     | '/cart'
     | '/checkout'
@@ -196,6 +216,8 @@ export interface FileRouteTypes {
     | '/claim-admin'
     | '/contact'
     | '/gallery'
+    | '/privacy'
+    | '/term'
     | '/admin'
     | '/cart'
     | '/checkout'
@@ -215,6 +237,8 @@ export interface FileRouteTypes {
     | '/claim-admin'
     | '/contact'
     | '/gallery'
+    | '/privacy'
+    | '/term'
     | '/_authenticated/admin'
     | '/_authenticated/cart'
     | '/_authenticated/checkout'
@@ -235,6 +259,8 @@ export interface RootRouteChildren {
   ClaimAdminRoute: typeof ClaimAdminRoute
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermRoute: typeof TermRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ExperiencesSlugRoute: typeof ExperiencesSlugRoute
   ExperiencesIndexRoute: typeof ExperiencesIndexRoute
@@ -243,6 +269,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/term': {
+      id: '/term'
+      path: '/term'
+      fullPath: '/term'
+      preLoaderRoute: typeof TermRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery': {
       id: '/gallery'
       path: '/gallery'
@@ -403,6 +443,8 @@ const rootRouteChildren: RootRouteChildren = {
   ClaimAdminRoute: ClaimAdminRoute,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermRoute: TermRoute,
   CategorySlugRoute: CategorySlugRoute,
   ExperiencesSlugRoute: ExperiencesSlugRoute,
   ExperiencesIndexRoute: ExperiencesIndexRoute,

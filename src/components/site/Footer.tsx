@@ -32,7 +32,7 @@ const cols = [
       { name: "Workshops & Experiences", to: "/experiences" },
       { name: "Community Building", to: "/experiences" },
       { name: "Brand Collaborations", to: "/https://wa.me/917042095024" },
-      
+
     ],
   },
 ];
@@ -94,7 +94,7 @@ export function Footer() {
               +91 7042095024
 
             </a> </li>
-            
+
             <a
 
               href="https://wa.me/7042095024"
@@ -120,8 +120,21 @@ export function Footer() {
       <div className="mx-auto mt-12 flex max-w-7xl flex-col items-center justify-between gap-3 border-t border-border/60 px-4 pt-6 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-10">
         <div>© 2026 AN Out & About Events & Experiences. All Rights Reserved.</div>
         <div className="flex gap-5">
-          <a href="#" className="hover:text-primary">Privacy Policy</a>
-          <a href="#" className="hover:text-primary">Terms & Conditions</a>
+          <Link
+            to="/privacy"
+            className="hover:text-primary"
+          >
+            Privacy Policy
+          </Link>
+
+          <Link
+            to="/term"
+            className="hover:text-primary"
+          >
+            Terms & Conditions
+          </Link>
+
+
         </div>
       </div>
     </footer>
