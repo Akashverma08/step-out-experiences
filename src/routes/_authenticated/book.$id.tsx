@@ -21,8 +21,8 @@ export const Route = createFileRoute("/_authenticated/book/$id")({
   }),
 });
 
-const UPI_ID = "7428832025@apl";
-const UPI_NAME = "Akash Verma";
+const UPI_ID = "neha2904@ptyes";
+const UPI_NAME = "Neha Chaudary";
 
 
 

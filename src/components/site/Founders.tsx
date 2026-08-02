@@ -161,7 +161,7 @@ export function Founders() {
 
                             <div className="flex h-full flex-col rounded-3xl bg-rose-50/60 p-7">
                                 <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary">
-                                    Community Partner
+                                    Event Organizer
                                 </p>
 
                                 <h3 className="mt-3 text-3xl font-semibold text-ink">
@@ -208,7 +208,7 @@ export function Founders() {
 
                             <div className="flex h-full flex-col rounded-3xl bg-rose-50/60 p-7">
                                 <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary">
-                                    Community Partner
+                                    Social Media Manager
                                 </p>
 
                                 <h3 className="mt-3 text-3xl font-semibold text-ink">

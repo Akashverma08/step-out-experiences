@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Youtube, MessageCircle, MapPin, Phone, Mail } from "lucide-react";
+import { Instagram, MapPin, Phone, Mail } from "lucide-react";
+import { FaWhatsapp, FaInstagram } from "react-icons/fa";
 import { Logo } from "./Logo";
 
 const cols = [
@@ -18,8 +19,8 @@ const cols = [
     items: [
       { name: "Art & Creativity", to: "/category/art" },
       { name: "Food & Drinks", to: "/category/food" },
-      { name: "Workshops", to: "/experiences"},
-      { name: "Social Gatherings", to: "/experiences"},
+      { name: "Workshops", to: "/experiences" },
+      { name: "Social Gatherings", to: "/experiences" },
       { name: "All Experiences", to: "/experiences" },
     ],
   },
@@ -27,11 +28,11 @@ const cols = [
   {
     title: "Services",
     items: [
-      { name: "Event Planning", to: "/contact"},
-      { name: "Workshops & Experiences", to: "/experiences"},
-      { name: "Community Building", to: "/experiences"},
-      { name: "Brand Collaborations", to: "/contact"},
-      { name: "Private Events", to: "/contact"}
+      { name: "Event Planning", to: "/https://wa.me/917042095024" },
+      { name: "Workshops & Experiences", to: "/experiences" },
+      { name: "Community Building", to: "/experiences" },
+      { name: "Brand Collaborations", to: "/https://wa.me/917042095024" },
+      
     ],
   },
 ];
@@ -45,12 +46,24 @@ export function Footer() {
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
             Creating meaningful experiences that bring people together, inspire creativity, and create stories worth remembering.
           </p>
-          <div className="mt-5 flex gap-2">
-            {[Facebook, Instagram, Youtube, MessageCircle].map((Icon, i) => (
-              <a key={i} href="#" className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-foreground/70 hover:bg-rose-gradient hover:text-primary-foreground transition">
-                <Icon className="h-4 w-4" />
-              </a>
-            ))}
+          <div className="mt-5 flex gap-3">
+            <a
+              href="https://www.instagram.com/__outandaboutevents"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-pink-600 hover:bg-pink-600 hover:text-white transition"
+            >
+              <FaInstagram className="h-5 w-5" />
+            </a>
+
+            <a
+              href="https://wa.me/917042095024"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-green-600 hover:bg-green-600 hover:text-white transition"
+            >
+              <FaWhatsapp className="h-5 w-5" />
+            </a>
           </div>
         </div>
 
@@ -88,7 +101,7 @@ export function Footer() {
             </a> </li>
             <a
 
-              href="https://wa.me/8448663421"
+              href="https://wa.me/7042095024"
 
               target="_blank"
 
@@ -98,7 +111,7 @@ export function Footer() {
 
             >
 
-              <MessageCircle className="h-3.5 w-3.5" />
+              <FaWhatsapp className="h-4 w-4" />
 
               Chat on WhatsApp
 
