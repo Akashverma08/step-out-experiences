@@ -89,16 +89,12 @@ export function Footer() {
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-ink">Contact Us</div>
           <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
             <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-primary" /> Delhi,India </li>
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" />  <a href="tel:+91 84486 63421">
+            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" />  <a href="tel:+91 7042095024">
 
-              +91 84486 63421
-
-            </a> </li>
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /><a href="mailto:akashverma0401@gmail.com">
-
-              hello@ANoutandabout.com
+              +91 7042095024
 
             </a> </li>
+            
             <a
 
               href="https://wa.me/7042095024"
@@ -107,7 +103,8 @@ export function Footer() {
 
               rel="noopener noreferrer"
 
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-50 px-3 py-1 text-emerald-700 hover:bg-emerald-100 transition"
+              className="inline-flex items-center gap-2 rounded-full border 
+              border-emerald-500/40 bg-emerald-50 px-3 py-1 text-emerald-700 hover:bg-emerald-100 transition"
 
             >
 

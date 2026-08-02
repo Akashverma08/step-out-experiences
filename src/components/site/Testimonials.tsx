@@ -107,8 +107,8 @@ export function Testimonials() {
       </div>
 
       <div className="mt-10 text-center">
-        <a href="https://instagram.com/an.outandabout.events" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-rose-gradient px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-luxe hover:opacity-95 transition">
-          <Instagram className="h-4 w-4" /> Follow @an.outandabout.events <ArrowRight className="h-4 w-4" />
+        <a href="https://www.instagram.com/__outandaboutevents" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-rose-gradient px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-luxe hover:opacity-95 transition">
+          <Instagram className="h-4 w-4" /> Follow @__outandaboutevents <ArrowRight className="h-4 w-4" />
         </a>
       </div>
     </section>
